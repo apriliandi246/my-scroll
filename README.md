@@ -4,6 +4,6 @@
 
 ### 👨‍💻 About
 
-Just multiscroll that I make for my work in my job, and suddenly became my personal project....
+Just a multiscroll that I make for my work in my job, and suddenly became my personal project....
 
 <h3 align="right">(⌐■_■)</h3>
