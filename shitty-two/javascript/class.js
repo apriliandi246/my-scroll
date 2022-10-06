@@ -9,10 +9,10 @@ class MultiScroll {
     this.navButtons = document.getElementsByClassName("dots-navigate__dot");
     this.totalSlide = this.slides.length;
 
-    this.triggerEventListeners();
+    this.triggerFunctionalities();
   }
 
-  triggerEventListeners() {
+  triggerFunctionalities() {
     this.slidesWhenFirstRender();
     this.buttonsNavWhenFirstRender();
     this.keyboardEvents();
@@ -24,28 +24,25 @@ class MultiScroll {
 
   buttonsNavWhenFirstRender() {
     for (let index = 0; index < this.navButtons.length; index++) {
-      const navButton = this.navButtons[index];
-
-      navButton.dataset.slideNav = index + 1;
-      navButton.setAttribute("aria-label", `to slide ${index + 1}`);
+      this.navButtons[index].dataset.slideNav = index + 1;
+      this.navButtons[index].setAttribute("aria-label", `to slide ${index + 1}`);
     }
   }
 
   slidesWhenFirstRender() {
     for (let index = 0; index < this.totalSlide; index++) {
       const slide = this.slides[index];
-      const transformValue = `${index}00%`;
-      const totalChildSlide = slide.childElementCount;
+      const totalElementChildSlide = slide.childElementCount;
 
-      if (totalChildSlide === 2) {
+      if (totalElementChildSlide === 2) {
         slide.dataset.slideType = "multi";
-        slide.firstElementChild.style.transform = `translateY(${transformValue})`;
-        slide.lastElementChild.style.transform = `translateY(-${transformValue})`;
+        slide.firstElementChild.style.transform = `translateY(${index}00%)`;
+        slide.lastElementChild.style.transform = `translateY(-${index}00%)`;
       }
 
-      if (totalChildSlide === 1) {
+      if (totalElementChildSlide === 1) {
         slide.dataset.slideType = "full";
-        slide.firstElementChild.style.transform = `translateY(${transformValue})`;
+        slide.firstElementChild.style.transform = `translateY(${index}00%)`;
       }
 
       if (window.innerWidth > this.MOBILE_SIZE) {
@@ -98,14 +95,12 @@ class MultiScroll {
           const slideSelected = parseInt(event.target.dataset.slideNav);
           const slideComparison = Math.abs(this.currentSlide - slideSelected);
 
-          if (this.currentSlide + 1 === slideSelected || this.currentSlide - 1 === slideSelected) {
-            if (slideSelected > this.currentSlide) {
-              this.oneTimeSliding("bottom");
-            }
+          if (this.currentSlide + 1 === slideSelected) {
+            this.oneTimeSliding("bottom");
+          }
 
-            if (slideSelected < this.currentSlide) {
-              this.oneTimeSliding("top");
-            }
+          if (this.currentSlide - 1 === slideSelected) {
+            this.oneTimeSliding("top");
           }
 
           if (this.currentSlide !== this.totalSlide && slideSelected > this.currentSlide) {
@@ -190,31 +185,35 @@ class MultiScroll {
 
   oneTimeSliding(direction) {
     for (let index = 0; index < this.totalSlide; index++) {
-      const leftSlide = this.slides[index].firstElementChild;
-      const rightSlide = this.slides[index].lastElementChild;
-      const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-      const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
       const slideType = this.slides[index].dataset.slideType.toLowerCase();
 
-      if (direction === "bottom") {
-        if (slideType === "multi") {
+      if (slideType === "multi") {
+        const leftSlide = this.slides[index].firstElementChild;
+        const rightSlide = this.slides[index].lastElementChild;
+        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+
+        if (direction === "bottom") {
           leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
           rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
         }
 
-        if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-        }
-      }
-
-      if (direction === "top") {
-        if (slideType === "multi") {
+        if (direction === "top") {
           leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
           rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
         }
+      }
 
-        if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+      if (slideType === "full") {
+        const fullSlide = this.slides[index].firstElementChild;
+        const translateYFullSlide = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
+
+        if (direction === "bottom") {
+          fullSlide.style.transform = `translateY(${translateYFullSlide - 100}%)`;
+        }
+
+        if (direction === "top") {
+          fullSlide.style.transform = `translateY(${translateYFullSlide + 100}%)`;
         }
       }
     }
@@ -244,31 +243,35 @@ class MultiScroll {
 
     for (let index = 0; index < slideComparison; index++) {
       for (let innerIndex = 0; innerIndex < this.totalSlide; innerIndex++) {
-        const leftSlide = this.slides[innerIndex].firstElementChild;
-        const rightSlide = this.slides[innerIndex].lastElementChild;
-        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
         const slideType = this.slides[innerIndex].dataset.slideType.toLowerCase();
 
-        if (direction === "bottom") {
-          if (slideType === "multi") {
+        if (slideType === "multi") {
+          const leftSlide = this.slides[innerIndex].firstElementChild;
+          const rightSlide = this.slides[innerIndex].lastElementChild;
+          const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+          const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+
+          if (direction === "bottom") {
             leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
             rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
           }
 
-          if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-          }
-        }
-
-        if (direction === "top") {
-          if (slideType === "multi") {
+          if (direction === "top") {
             leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
             rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
           }
+        }
 
-          if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+        if (slideType === "full") {
+          const fullSlide = this.slides[innerIndex].firstElementChild;
+          const translateYFullSlide = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
+
+          if (direction === "bottom") {
+            fullSlide.style.transform = `translateY(${translateYFullSlide - 100}%)`;
+          }
+
+          if (direction === "top") {
+            fullSlide.style.transform = `translateY(${translateYFullSlide + 100}%)`;
           }
         }
       }
@@ -282,7 +285,6 @@ class MultiScroll {
 
     this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
     this.navButtons[this.currentSlide - 1].focus();
-
     this.slides[this.currentSlide - 1].style.zIndex = "1";
   }
 }

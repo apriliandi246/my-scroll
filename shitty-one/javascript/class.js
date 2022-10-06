@@ -242,7 +242,6 @@ class MultiScroll {
 
     this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
     this.navButtons[this.currentSlide - 1].focus();
-
     this.slides[this.currentSlide - 1].style.zIndex = "1";
   }
 }
