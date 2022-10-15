@@ -1,8 +1,7 @@
 (function () {
-  let prevSlide = 1;
   let currentSlide = 1;
-  let canWheel = true;
-  let canKeydown = true;
+  let isWheelEventDelay = true;
+  let isKeyboardEventDelay = true;
 
   const MOBILE_SIZE = 992;
   const body = document.body;
@@ -15,150 +14,119 @@
     for (let index = 0; index < totalSlide; index++) {
       const leftSlide = slides[index].firstElementChild;
       const rightSlide = slides[index].lastElementChild;
-      const leftTranslateY = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-      const rightTranslateY = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+      const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+      const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
       const slideType = slides[index].dataset.slideType.toLowerCase();
 
       if (direction === "bottom") {
         if (slideType === "multi") {
-          leftSlide.style.transform = `translateY(${leftTranslateY - 100}%)`;
-          rightSlide.style.transform = `translateY(${rightTranslateY + 100}%)`;
+          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+          rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
         }
 
         if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${leftTranslateY - 100}%)`;
+          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
         }
       }
 
       if (direction === "top") {
         if (slideType === "multi") {
-          leftSlide.style.transform = `translateY(${leftTranslateY + 100}%)`;
-          rightSlide.style.transform = `translateY(${rightTranslateY - 100}%)`;
+          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+          rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
         }
 
         if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${leftTranslateY + 100}%)`;
+          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
         }
       }
     }
 
-    slides[currentSlide - 1].style.removeProperty("z-index");
+    slides[currentSlide - 1].removeAttribute("style");
+    slides[currentSlide - 1].setAttribute("aria-hidden", true);
+    navButtons[currentSlide - 1].classList.remove("dots-navigate__dot--active");
 
     if (direction === "bottom") {
-      slides[currentSlide - 1].setAttribute("aria-hidden", true);
       slides[currentSlide - 1].nextElementSibling.removeAttribute("aria-hidden");
-      navButtons[prevSlide - 1].classList.remove("dots-navigate__dot--active");
-
       currentSlide += 1;
-      prevSlide = currentSlide;
-
-      navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
-      navButtons[currentSlide - 1].focus();
     }
 
     if (direction === "top") {
-      slides[currentSlide - 1].setAttribute("aria-hidden", true);
       slides[currentSlide - 1].previousElementSibling.removeAttribute("aria-hidden");
-      navButtons[prevSlide - 1].classList.remove("dots-navigate__dot--active");
-
       currentSlide -= 1;
-      prevSlide = currentSlide;
-
-      navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
-      navButtons[currentSlide - 1].focus();
     }
 
+    navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
+    navButtons[currentSlide - 1].focus();
     slides[currentSlide - 1].style.zIndex = "1";
   }
 
   // Handle more than one step sliding
   function multipleSliding(direction, slideComparison, recentSlide) {
-    slides[currentSlide - 1].style.removeProperty("z-index");
+    slides[currentSlide - 1].removeAttribute("style");
 
-    // Sliding to bottom
-    if (direction === "bottom") {
-      for (let index = 0; index < slideComparison; index++) {
-        for (let innerIndex = 0; innerIndex < totalSlide; innerIndex++) {
-          const leftSlide = slides[innerIndex].firstElementChild;
-          const rightSlide = slides[innerIndex].lastElementChild;
-          const leftTranslateY = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-          const rightTranslateY = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
-          const slideType = slides[innerIndex].dataset.slideType.toLowerCase();
+    for (let index = 0; index < slideComparison; index++) {
+      for (let innerIndex = 0; innerIndex < totalSlide; innerIndex++) {
+        const leftSlide = slides[innerIndex].firstElementChild;
+        const rightSlide = slides[innerIndex].lastElementChild;
+        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const slideType = slides[innerIndex].dataset.slideType.toLowerCase();
 
+        if (direction === "bottom") {
           if (slideType === "multi") {
-            leftSlide.style.transform = `translateY(${leftTranslateY - 100}%)`;
-            rightSlide.style.transform = `translateY(${rightTranslateY + 100}%)`;
+            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+            rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
           }
 
           if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${leftTranslateY - 100}%)`;
+            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
           }
         }
-      }
 
-      slides[currentSlide - 1].setAttribute("aria-hidden", true);
-      slides[recentSlide - 1].removeAttribute("aria-hidden");
-      navButtons[prevSlide - 1].classList.remove("dots-navigate__dot--active");
-
-      currentSlide = recentSlide;
-      prevSlide = recentSlide;
-
-      navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
-      navButtons[currentSlide - 1].focus();
-    }
-
-    // Sliding to top
-    if (direction === "top") {
-      for (let index = 0; index < slideComparison; index++) {
-        for (let innerIndex = 0; innerIndex < totalSlide; innerIndex++) {
-          const leftSlide = slides[innerIndex].firstElementChild;
-          const rightSlide = slides[innerIndex].lastElementChild;
-          const leftTranslateY = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-          const rightTranslateY = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
-          const slideType = slides[innerIndex].dataset.slideType.toLowerCase();
-
+        if (direction === "top") {
           if (slideType === "multi") {
-            leftSlide.style.transform = `translateY(${leftTranslateY + 100}%)`;
-            rightSlide.style.transform = `translateY(${rightTranslateY - 100}%)`;
+            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+            rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
           }
 
           if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${leftTranslateY + 100}%)`;
+            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
           }
         }
       }
-
-      slides[currentSlide - 1].setAttribute("aria-hidden", true);
-      slides[recentSlide - 1].removeAttribute("aria-hidden");
-      navButtons[prevSlide - 1].classList.remove("dots-navigate__dot--active");
-
-      currentSlide = recentSlide;
-      prevSlide = recentSlide;
-
-      navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
-      navButtons[currentSlide - 1].focus();
     }
 
+    slides[currentSlide - 1].setAttribute("aria-hidden", true);
+    slides[recentSlide - 1].removeAttribute("aria-hidden");
+    navButtons[currentSlide - 1].classList.remove("dots-navigate__dot--active");
+
+    currentSlide = recentSlide;
+
+    navButtons[currentSlide - 1].classList.add("dots-navigate__dot--active");
+    navButtons[currentSlide - 1].focus();
     slides[currentSlide - 1].style.zIndex = "1";
   }
 
-  // Handle position of the slides and the aria-hidden when the first render
+  // Generate some important things when HTML got parsed
   document.addEventListener("DOMContentLoaded", () => {
-    for (let index = 0; index < slides.length; index++) {
+    // Generate "translateY" for positing the slide
+    for (let index = 0; index < totalSlide; index++) {
       const slide = slides[index];
-      const slideType = slide.dataset.slideType.toLowerCase();
-      const transformValue = `${index}00%`;
+      const totalElementChildSlide = slide.childElementCount;
 
-      if (slideType === "multi") {
-        slide.firstElementChild.style.transform = `translateY(${transformValue})`;
-        slide.lastElementChild.style.transform = `translateY(-${transformValue})`;
+      if (totalElementChildSlide === 2) {
+        slide.dataset.slideType = "multi";
+        slide.firstElementChild.style.transform = `translateY(${index}00%)`;
+        slide.lastElementChild.style.transform = `translateY(-${index}00%)`;
       }
 
-      if (slideType === "full") {
-        slide.firstElementChild.style.transform = `translateY(${transformValue})`;
+      if (totalElementChildSlide === 1) {
+        slide.dataset.slideType = "full";
+        slide.firstElementChild.style.transform = `translateY(${index}00%)`;
       }
     }
 
+    // Generate "aria-hidden" when comes to dekstop view
     if (window.innerWidth > MOBILE_SIZE) {
       slides[0].style.zIndex = "1";
 
@@ -167,6 +135,36 @@
           slides[index].setAttribute("aria-hidden", true);
         }
       }
+    }
+
+    // Remove the "aria-hidden" when comes to mobile view
+    if (window.innerWidth < MOBILE_SIZE) {
+      for (let index = 0; index < slides.length; index++) {
+        slides[index].removeAttribute("aria-hidden");
+      }
+    }
+
+    // Buttons nav
+    for (let index = 0; index < navButtons.length; index++) {
+      navButtons[index].setAttribute("data-slide-nav", index + 1);
+      navButtons[index].setAttribute("aria-label", `to slide ${index + 1}`);
+
+      navButtons[index].addEventListener("click", () => {
+        if (window.innerWidth > MOBILE_SIZE) {
+          const currentSlideSelected = parseInt(index + 1);
+          const slideComparison = Math.abs(currentSlide - currentSlideSelected);
+
+          // Slide to bottom
+          if (currentSlide !== totalSlide && currentSlideSelected > currentSlide) {
+            multipleSliding("bottom", slideComparison, currentSlideSelected);
+          }
+
+          // Slide to top
+          if (currentSlide !== 1 && currentSlideSelected < currentSlide) {
+            multipleSliding("top", slideComparison, currentSlideSelected);
+          }
+        }
+      });
     }
   });
 
@@ -192,35 +190,15 @@
     }
   });
 
-  // Buttons nav
-  for (let navBtn = 0; navBtn <= navButtons.length - 1; navBtn++) {
-    navButtons[navBtn].addEventListener("click", (event) => {
-      if (window.innerWidth > MOBILE_SIZE) {
-        const currentSlideSelected = parseInt(event.target.dataset.slideNav);
-        const slideComparison = Math.abs(prevSlide - currentSlideSelected);
-
-        // Slide to bottom
-        if (currentSlide !== totalSlide && currentSlideSelected > prevSlide) {
-          multipleSliding("bottom", slideComparison, currentSlideSelected);
-        }
-
-        // Slide to top
-        if (currentSlide !== 1 && currentSlideSelected < prevSlide) {
-          multipleSliding("top", slideComparison, currentSlideSelected);
-        }
-      }
-    });
-  }
-
   // Mouse wheel
   body.addEventListener(
     "wheel",
     (event) => {
       if (window.innerWidth > MOBILE_SIZE) {
-        if (canWheel === true) {
+        if (isWheelEventDelay === true) {
           const scrollValue = event.deltaY;
 
-          canWheel = false;
+          isWheelEventDelay = false;
 
           // Scroll to bottom
           if (currentSlide !== totalSlide && scrollValue > 0) {
@@ -233,7 +211,7 @@
           }
 
           setTimeout(() => {
-            canWheel = true;
+            isWheelEventDelay = true;
           }, 700);
         }
       }
@@ -244,20 +222,20 @@
   // Keyboard interactions
   body.addEventListener("keydown", (event) => {
     if (window.innerWidth >= MOBILE_SIZE) {
-      if (canKeydown === true) {
+      if (isKeyboardEventDelay === true) {
         const key = event.key.toLowerCase();
 
-        canKeydown = false;
+        isKeyboardEventDelay = false;
 
         // End
         if (currentSlide !== totalSlide && key === "end") {
-          const slideComparison = Math.abs(prevSlide - totalSlide);
+          const slideComparison = Math.abs(currentSlide - totalSlide);
           multipleSliding("bottom", slideComparison, totalSlide);
         }
 
         // Home
         if (currentSlide !== 1 && key === "home") {
-          const slideComparison = Math.abs(prevSlide - 1);
+          const slideComparison = Math.abs(currentSlide - 1);
           multipleSliding("top", slideComparison, 1);
         }
 
@@ -276,7 +254,7 @@
         }
 
         setTimeout(() => {
-          canKeydown = true;
+          isKeyboardEventDelay = true;
         }, 700);
       }
     }

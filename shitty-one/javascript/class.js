@@ -20,6 +20,103 @@ class MultiScroll {
     this.setAriaHiddenWhileResizing();
   }
 
+  oneTimeSliding(direction) {
+    for (let index = 0; index < this.totalSlide; index++) {
+      const leftSlide = this.slides[index].firstElementChild;
+      const rightSlide = this.slides[index].lastElementChild;
+      const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+      const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+      const slideType = this.slides[index].dataset.slideType.toLowerCase();
+
+      if (direction === "bottom") {
+        if (slideType === "multi") {
+          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+          rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
+        }
+
+        if (slideType === "full") {
+          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+        }
+      }
+
+      if (direction === "top") {
+        if (slideType === "multi") {
+          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+          rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
+        }
+
+        if (slideType === "full") {
+          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+        }
+      }
+    }
+
+    this.slides[this.currentSlide - 1].removeAttribute("style");
+    this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
+
+    if (direction === "bottom") {
+      this.slides[this.currentSlide - 1].nextElementSibling.removeAttribute("aria-hidden");
+      this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
+      this.currentSlide += 1;
+    }
+
+    if (direction === "top") {
+      this.slides[this.currentSlide - 1].previousElementSibling.removeAttribute("aria-hidden");
+      this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
+      this.currentSlide -= 1;
+    }
+
+    this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
+    this.navButtons[this.currentSlide - 1].focus();
+    this.slides[this.currentSlide - 1].style.zIndex = "1";
+  }
+
+  multipleTimeSliding(direction, slideComparison, recentSlide) {
+    this.slides[this.currentSlide - 1].removeAttribute("style");
+
+    for (let index = 0; index < slideComparison; index++) {
+      for (let innerIndex = 0; innerIndex < this.totalSlide; innerIndex++) {
+        const leftSlide = this.slides[innerIndex].firstElementChild;
+        const rightSlide = this.slides[innerIndex].lastElementChild;
+        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const slideType = this.slides[innerIndex].dataset.slideType.toLowerCase();
+
+        if (direction === "bottom") {
+          if (slideType === "multi") {
+            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+            rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
+          }
+
+          if (slideType === "full") {
+            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
+          }
+        }
+
+        if (direction === "top") {
+          if (slideType === "multi") {
+            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+            rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
+          }
+
+          if (slideType === "full") {
+            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
+          }
+        }
+      }
+    }
+
+    this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
+    this.slides[recentSlide - 1].removeAttribute("aria-hidden");
+    this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
+
+    this.currentSlide = recentSlide;
+
+    this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
+    this.navButtons[this.currentSlide - 1].focus();
+    this.slides[this.currentSlide - 1].style.zIndex = "1";
+  }
+
   removeMobileAriaHidden() {
     if (window.innerWidth < this.MOBILE_SIZE) {
       for (let index = 0; index < this.totalSlide; index++) {
@@ -146,103 +243,6 @@ class MultiScroll {
         }
       }
     });
-  }
-
-  oneTimeSliding(direction) {
-    for (let index = 0; index < this.totalSlide; index++) {
-      const leftSlide = this.slides[index].firstElementChild;
-      const rightSlide = this.slides[index].lastElementChild;
-      const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-      const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
-      const slideType = this.slides[index].dataset.slideType.toLowerCase();
-
-      if (direction === "bottom") {
-        if (slideType === "multi") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-          rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
-        }
-
-        if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-        }
-      }
-
-      if (direction === "top") {
-        if (slideType === "multi") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
-          rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
-        }
-
-        if (slideType === "full") {
-          leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
-        }
-      }
-    }
-
-    this.slides[this.currentSlide - 1].removeAttribute("style");
-    this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
-
-    if (direction === "bottom") {
-      this.slides[this.currentSlide - 1].nextElementSibling.removeAttribute("aria-hidden");
-      this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
-      this.currentSlide += 1;
-    }
-
-    if (direction === "top") {
-      this.slides[this.currentSlide - 1].previousElementSibling.removeAttribute("aria-hidden");
-      this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
-      this.currentSlide -= 1;
-    }
-
-    this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
-    this.navButtons[this.currentSlide - 1].focus();
-    this.slides[this.currentSlide - 1].style.zIndex = "1";
-  }
-
-  multipleTimeSliding(direction, slideComparison, recentSlide) {
-    this.slides[this.currentSlide - 1].removeAttribute("style");
-
-    for (let index = 0; index < slideComparison; index++) {
-      for (let innerIndex = 0; innerIndex < this.totalSlide; innerIndex++) {
-        const leftSlide = this.slides[innerIndex].firstElementChild;
-        const rightSlide = this.slides[innerIndex].lastElementChild;
-        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
-        const slideType = this.slides[innerIndex].dataset.slideType.toLowerCase();
-
-        if (direction === "bottom") {
-          if (slideType === "multi") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-            rightSlide.style.transform = `translateY(${translateYRightSlide + 100}%)`;
-          }
-
-          if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
-          }
-        }
-
-        if (direction === "top") {
-          if (slideType === "multi") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
-            rightSlide.style.transform = `translateY(${translateYRightSlide - 100}%)`;
-          }
-
-          if (slideType === "full") {
-            leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
-          }
-        }
-      }
-    }
-
-    this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
-    this.slides[recentSlide - 1].removeAttribute("aria-hidden");
-    this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
-
-    this.currentSlide = recentSlide;
-
-    this.navButtons[this.currentSlide - 1].classList.add("dots-navigate__dot--active");
-    this.navButtons[this.currentSlide - 1].focus();
-    this.slides[this.currentSlide - 1].style.zIndex = "1";
   }
 }
 
