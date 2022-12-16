@@ -1,54 +1,55 @@
 class MultiScroll {
-  constructor() {
+  constructor(delayDuration, mobileSize) {
     this.currentSlide = 1;
-    this.MOBILE_SIZE = 992;
+    this.mobileSize = mobileSize;
     this.isWheelEventDelay = true;
     this.isKeyboardEventDelay = true;
-
+    this.delayDuration = delayDuration;
+    this.navDatasetAttribute = "data-slide-nav";
+    this.slideDatasetAttribute = "data-slide-type";
     this.slides = document.getElementsByClassName("slide-wrapper");
     this.navButtons = document.getElementsByClassName("dots-navigate__dot");
-    this.totalSlide = this.slides.length;
 
     this.triggerFunctionalities();
   }
 
   triggerFunctionalities() {
-    this.slidesWhenFirstRender();
-    this.buttonsNavWhenFirstRender();
     this.keyboardEvents();
     this.mouseWheelEvent();
     this.navigatingButtons();
+    this.slidesWhenFirstRender();
     this.removeMobileAriaHidden();
+    this.buttonsNavWhenFirstRender();
     this.setAriaHiddenWhileResizing();
   }
 
   buttonsNavWhenFirstRender() {
     for (let index = 0; index < this.navButtons.length; index++) {
-      this.navButtons[index].dataset.slideNav = index + 1;
+      this.navButtons[index].setAttribute(this.navDatasetAttribute, index + 1);
       this.navButtons[index].setAttribute("aria-label", `to slide ${index + 1}`);
     }
   }
 
   slidesWhenFirstRender() {
-    for (let index = 0; index < this.totalSlide; index++) {
+    for (let index = 0; index < this.slides.length; index++) {
       const slide = this.slides[index];
       const totalElementChildSlide = slide.childElementCount;
 
       if (totalElementChildSlide === 2) {
-        slide.dataset.slideType = "multi";
+        slide.setAttribute(this.slideDatasetAttribute, "multi");
         slide.firstElementChild.style.transform = `translateY(${index}00%)`;
         slide.lastElementChild.style.transform = `translateY(-${index}00%)`;
       }
 
       if (totalElementChildSlide === 1) {
-        slide.dataset.slideType = "full";
+        slide.setAttribute(this.slideDatasetAttribute, "full");
         slide.firstElementChild.style.transform = `translateY(${index}00%)`;
       }
 
-      if (window.innerWidth > this.MOBILE_SIZE) {
+      if (window.innerWidth > this.mobileSize) {
         this.slides[0].style.zIndex = "1";
 
-        for (let index = 0; index < this.totalSlide; index++) {
+        for (let index = 0; index < this.slides.length; index++) {
           if (index !== 0) {
             this.slides[index].setAttribute("aria-hidden", true);
           }
@@ -58,30 +59,28 @@ class MultiScroll {
   }
 
   removeMobileAriaHidden() {
-    if (window.innerWidth < this.MOBILE_SIZE) {
-      for (let index = 0; index < this.totalSlide; index++) {
+    if (window.innerWidth < this.mobileSize) {
+      for (let index = 0; index < this.slides.length; index++) {
         this.slides[index].removeAttribute("aria-hidden");
       }
     }
   }
 
   setAriaHiddenWhileResizing() {
-    window.addEventListener("resize", (event) => {
-      if (event.target.innerWidth > this.MOBILE_SIZE) {
-        document.body.scrollTop = 0;
-        document.documentElement.scrollTop = 0;
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > this.mobileSize) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        this.slides[this.currentSlide - 1].style.zIndex = "1";
 
-        this.slides[this.currentSlide - 1].style.setProperty("z-index", "1");
-
-        for (let index = 0; index < this.totalSlide; index++) {
-          if (index !== this.currentSlide - 1) {
+        for (let index = 0; index < this.slides.length; index++) {
+          if (this.currentSlide - 1 !== index) {
             this.slides[index].setAttribute("aria-hidden", true);
           }
         }
       } else {
-        this.slides[this.currentSlide - 1].style.removeProperty("z-index");
+        this.slides[this.currentSlide - 1].style.zIndex = "auto";
 
-        for (let index = 0; index < this.totalSlide; index++) {
+        for (let index = 0; index < this.slides.length; index++) {
           this.slides[index].removeAttribute("aria-hidden");
         }
       }
@@ -90,9 +89,10 @@ class MultiScroll {
 
   navigatingButtons() {
     for (let index = 0; index < this.navButtons.length; index++) {
-      this.navButtons[index].addEventListener("click", (event) => {
-        if (window.innerWidth > this.MOBILE_SIZE) {
-          const slideSelected = parseInt(event.target.dataset.slideNav);
+      this.navButtons[index].addEventListener("click", () => {
+        if (window.innerWidth > this.mobileSize) {
+          const slideNavNumber = this.navButtons[index].getAttribute(this.navDatasetAttribute);
+          const slideSelected = parseInt(slideNavNumber);
           const slideComparison = Math.abs(this.currentSlide - slideSelected);
 
           if (this.currentSlide + 1 === slideSelected) {
@@ -103,7 +103,7 @@ class MultiScroll {
             this.oneTimeSliding("top");
           }
 
-          if (this.currentSlide !== this.totalSlide && slideSelected > this.currentSlide) {
+          if (this.currentSlide !== this.slides.length && slideSelected > this.currentSlide) {
             this.multipleTimeSliding("bottom", slideComparison, slideSelected);
           }
 
@@ -116,16 +116,15 @@ class MultiScroll {
   }
 
   mouseWheelEvent() {
-    document.body.addEventListener(
+    window.addEventListener(
       "wheel",
       (event) => {
-        if (window.innerWidth > this.MOBILE_SIZE) {
+        if (window.innerWidth > this.mobileSize) {
           if (this.isWheelEventDelay === true) {
             const scrollValue = event.deltaY;
-
             this.isWheelEventDelay = false;
 
-            if (this.currentSlide !== this.totalSlide && scrollValue > 0) {
+            if (this.currentSlide !== this.slides.length && scrollValue > 0) {
               this.oneTimeSliding("bottom");
             }
 
@@ -135,7 +134,7 @@ class MultiScroll {
 
             setTimeout(() => {
               this.isWheelEventDelay = true;
-            }, 700);
+            }, this.delayDuration);
           }
         }
       },
@@ -145,17 +144,16 @@ class MultiScroll {
 
   keyboardEvents() {
     document.body.addEventListener("keydown", (event) => {
-      if (window.innerWidth >= this.MOBILE_SIZE) {
+      if (window.innerWidth >= this.mobileSize) {
         if (this.isKeyboardEventDelay === true) {
           const keyboardKey = event.key.toLowerCase();
-
           this.isKeyboardEventDelay = false;
 
-          if (this.currentSlide !== this.totalSlide && keyboardKey === "end") {
+          if (this.currentSlide !== this.slides.length && keyboardKey === "end") {
             this.multipleTimeSliding(
               "bottom",
-              Math.abs(this.currentSlide - this.totalSlide),
-              this.totalSlide
+              Math.abs(this.currentSlide - this.slides.length),
+              this.slides.length
             );
           }
 
@@ -164,7 +162,7 @@ class MultiScroll {
           }
 
           if (keyboardKey === "arrowdown" || keyboardKey === "pagedown") {
-            if (this.currentSlide !== this.totalSlide) {
+            if (this.currentSlide !== this.slides.length) {
               this.oneTimeSliding("bottom");
             }
           }
@@ -177,15 +175,15 @@ class MultiScroll {
 
           setTimeout(() => {
             this.isKeyboardEventDelay = true;
-          }, 700);
+          }, this.delayDuration);
         }
       }
     });
   }
 
   oneTimeSliding(direction) {
-    for (let index = 0; index < this.totalSlide; index++) {
-      const slideType = this.slides[index].dataset.slideType.toLowerCase();
+    for (let index = 0; index < this.slides.length; index++) {
+      const slideType = this.slides[index].getAttribute(this.slideDatasetAttribute);
 
       if (slideType === "multi") {
         const leftSlide = this.slides[index].firstElementChild;
@@ -218,17 +216,17 @@ class MultiScroll {
       }
     }
 
-    this.slides[this.currentSlide - 1].removeAttribute("style");
+    this.slides[this.currentSlide - 1].style.zIndex = "auto";
     this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
 
     if (direction === "bottom") {
-      this.slides[this.currentSlide - 1].nextElementSibling.removeAttribute("aria-hidden");
+      this.slides[this.currentSlide - 1].nextElementSibling.setAttribute("aria-hidden", false);
       this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
       this.currentSlide += 1;
     }
 
     if (direction === "top") {
-      this.slides[this.currentSlide - 1].previousElementSibling.removeAttribute("aria-hidden");
+      this.slides[this.currentSlide - 1].previousElementSibling.setAttribute("aria-hidden", false);
       this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
       this.currentSlide -= 1;
     }
@@ -239,11 +237,11 @@ class MultiScroll {
   }
 
   multipleTimeSliding(direction, slideComparison, recentSlide) {
-    this.slides[this.currentSlide - 1].removeAttribute("style");
+    this.slides[this.currentSlide - 1].style.zIndex = "auto";
 
     for (let index = 0; index < slideComparison; index++) {
-      for (let innerIndex = 0; innerIndex < this.totalSlide; innerIndex++) {
-        const slideType = this.slides[innerIndex].dataset.slideType.toLowerCase();
+      for (let innerIndex = 0; innerIndex < this.slides.length; innerIndex++) {
+        const slideType = this.slides[innerIndex].getAttribute(this.slideDatasetAttribute);
 
         if (slideType === "multi") {
           const leftSlide = this.slides[innerIndex].firstElementChild;
@@ -277,8 +275,8 @@ class MultiScroll {
       }
     }
 
+    this.slides[recentSlide - 1].setAttribute("aria-hidden", false);
     this.slides[this.currentSlide - 1].setAttribute("aria-hidden", true);
-    this.slides[recentSlide - 1].removeAttribute("aria-hidden");
     this.navButtons[this.currentSlide - 1].classList.remove("dots-navigate__dot--active");
 
     this.currentSlide = recentSlide;
@@ -289,4 +287,4 @@ class MultiScroll {
   }
 }
 
-new MultiScroll();
+new MultiScroll(600, 992);

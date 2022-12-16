@@ -1,3 +1,7 @@
+:root {
+  --transition-duration: 600ms;
+}
+
 *,
 *::before,
 *::after {
@@ -36,7 +40,8 @@ body {
   cursor: pointer;
   border-radius: 100%;
   border: 2px solid #292323;
-  transition: background-color 600ms ease-in-out, transform 600ms ease-in-out;
+  transition: background-color var(--transition-duration) ease-in-out,
+    transform var(--transition-duration) ease-in-out;
 }
 
 .dots-navigate__dot--active {
@@ -64,14 +69,14 @@ body {
   width: 50%;
   height: 100%;
   position: relative;
-  transition: transform 600ms ease-in-out;
+  transition: transform var(--transition-duration) ease-in-out;
 }
 
 .slide-wrapper-full {
   width: 100%;
   height: 100%;
   position: relative;
-  transition: transform 600ms ease-in-out;
+  transition: transform var(--transition-duration) ease-in-out;
 }
 
 .slide-content {
