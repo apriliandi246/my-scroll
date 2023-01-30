@@ -1,4 +1,4 @@
-<h1 align="center">🖱 scroll-swipe-functionality</h1>
+<h1 align="center">🖱 scroll-swipe-functionalities</h1>
 
 <br>
 
