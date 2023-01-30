@@ -1,0 +1,13 @@
+=> Some shit to do <=
+- KEPP IT SIMPLE
+- Adjust and improve data structure in the app.
+- Some naming convention need to improve.
+
+=> Some fucking issues <=
+- For mobile slide functionality, it is limit from the platform
+  (web) or just stupid code that I write.
+
+=> SOME SHIT <=
+- transform: translate3d();
+- https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#improving_scrolling_performance_with_passive_listeners
+- change from percent to pixel for swipe slide
