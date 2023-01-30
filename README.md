@@ -1,4 +1,4 @@
-<h1 align="center">🖱 just-multiscroll</h1>
+<h1 align="center">🖱 scroll-swipe-functionality</h1>
 
 <br>
 
