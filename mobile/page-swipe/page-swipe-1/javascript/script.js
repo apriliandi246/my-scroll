@@ -19,6 +19,8 @@ class MultiScroll {
   }
 
   slidesFirstRender() {
+    this.slides[0].style.zIndex = "1";
+
     for (let index = 0; index < this.slides.length; index++) {
       this.slides[index].firstElementChild.style.transform = `translateY(${index}00%)`;
     }
@@ -103,6 +105,8 @@ class MultiScroll {
         fullSlide.style.transform = `translateY(${translateYFullSlide + 100}%)`;
       }
     }
+
+    this.slides[this.currentSlide - 1].style.zIndex = "";
 
     if (direction === "bottom") {
       this.currentSlide += 1;

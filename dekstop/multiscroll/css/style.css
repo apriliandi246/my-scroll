@@ -11,8 +11,6 @@
 }
 
 body {
-  margin: 0;
-  padding: 0;
   width: 100vw;
   height: 100vh;
   overflow-y: hidden;
@@ -40,8 +38,7 @@ body {
   cursor: pointer;
   border-radius: 100%;
   border: 2px solid #292323;
-  transition: background-color var(--transition-duration) ease-in-out,
-    transform var(--transition-duration) ease-in-out;
+  transition: background-color var(--transition-duration) ease-in-out, transform var(--transition-duration) ease-in-out;
 }
 
 .dots-navigate__dot--active {
@@ -87,8 +84,7 @@ body {
   font-size: 44px;
   align-items: center;
   justify-content: center;
-  text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1),
-    0px 18px 23px rgba(0, 0, 0, 0.1);
+  text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4), 0px 8px 13px rgba(0, 0, 0, 0.1), 0px 18px 23px rgba(0, 0, 0, 0.1);
 }
 
 /* Full slide */
