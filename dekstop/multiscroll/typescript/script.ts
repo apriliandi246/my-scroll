@@ -1,7 +1,36 @@
-class MultiScroll {
-  constructor(mobileSize) {
+/*
+=> Resourse for HTML Interface:
+  => https://developer.mozilla.org/en-US/docs/Web/API/Element
+  => https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+  => https://www.w3.org/TR/DOM-Level-3-Core/core.html#ID-1950641247
+*/
+
+/*
+=> Strategies:
+  => For DOM manipulation, the data type based HTML interface. So Typescript will check
+     if some property or method we use from some HTML element it's avaiable or not.
+
+  => For common data type, 
+*/
+
+class Multiscroll {
+  private mobileSize: number;
+  private totalSlides: number;
+  private currentSlide: number;
+  private slides: HTMLCollection;
+  private totalNavButtons: number;
+  private isWheelEventDelay: boolean;
+  private navButtons: HTMLCollection;
+  private navDatasetAttribute: string;
+  private transitionDelayTime: number;
+  private isKeyboardEventDelay: boolean;
+  private slideDatasetAttribute: string;
+  private activeNavBtnClassname: string;
+  private cssVariableTransitionDelay: string;
+
+  constructor() {
     this.currentSlide = 0;
-    this.mobileSize = mobileSize;
+    this.mobileSize = 992;
     this.isWheelEventDelay = true;
     this.isKeyboardEventDelay = true;
     this.navDatasetAttribute = "data-slide-nav";
@@ -14,39 +43,47 @@ class MultiScroll {
     this.totalNavButtons = this.navButtons.length;
     this.transitionDelayTime;
 
-    this.triggerFunctionalities();
+    this.main();
   }
 
-  triggerFunctionalities() {
-    this.slidesFirstRender();
+  /*
+    Default viewport size is 992.
+    "mobileSize" it's when the app becomes mobile vide mode.
+  */
+  public setMobileViewportSize(viewportSize: number): void {
+    this.mobileSize = viewportSize;
+  }
+
+  private main(): void {
     this.navButtonsFirstRender();
+    this.slideFirstRender();
+    this.setAriaHiddenWhileResizing();
+    this.navigateNavButtons();
     this.navigateMouseScroll();
     this.navigateKeyboard();
-    this.navigateNavButtons();
-    this.setAriaHiddenWhileResizing();
   }
 
-  navButtonsFirstRender() {
+  private navButtonsFirstRender(): void {
     for (let index = 0; index < this.totalNavButtons; index++) {
-      const navButton = this.navButtons[index];
+      const navButton = this.navButtons[index] as HTMLButtonElement;
 
-      navButton.setAttribute(this.navDatasetAttribute, index);
+      navButton.setAttribute(this.navDatasetAttribute, `${index}`);
       navButton.setAttribute("aria-label", `to slide ${index}`);
     }
   }
 
-  slidesFirstRender() {
-    const documentEl = document.documentElement;
-    const transitionCSSVar = getComputedStyle(documentEl).getPropertyValue(this.cssVariableTransitionDelay);
-    const transitionDelayTime = parseInt(transitionCSSVar);
+  private slideFirstRender(): void {
+    const documentEl = document.documentElement as Element;
+    const transitionCSSVar: string = getComputedStyle(documentEl).getPropertyValue(this.cssVariableTransitionDelay);
+    const transitionDelayTimeValue: number = parseInt(transitionCSSVar);
 
-    this.transitionDelayTime = transitionDelayTime;
+    this.transitionDelayTime = transitionDelayTimeValue;
 
     for (let index = 0; index < this.totalSlides; index++) {
-      const slide = this.slides[index];
-      const leftSlideContent = slide.firstElementChild;
-      const rightSlideContent = slide.lastElementChild;
-      const totalSlideContent = slide.childElementCount;
+      const slide = this.slides[index] as HTMLDivElement;
+      const leftSlideContent = slide.firstElementChild as HTMLDivElement;
+      const rightSlideContent = slide.lastElementChild as HTMLDivElement;
+      const totalSlideContent: number = slide.childElementCount;
 
       if (totalSlideContent === 1) {
         slide.setAttribute(this.slideDatasetAttribute, "full");
@@ -63,7 +100,7 @@ class MultiScroll {
         slide.style.zIndex = "1";
 
         for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
+          const slide = this.slides[index] as HTMLDivElement;
 
           if (index === 0) {
             slide.setAttribute("aria-hidden", "false");
@@ -77,21 +114,23 @@ class MultiScroll {
 
       if (window.innerWidth < this.mobileSize) {
         for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
+          const slide = this.slides[index] as HTMLDivElement;
           slide.removeAttribute("aria-hidden");
         }
       }
     }
   }
 
-  setAriaHiddenWhileResizing() {
+  private setAriaHiddenWhileResizing(): void {
     window.addEventListener("resize", () => {
+      const currentSlide = this.slides[this.currentSlide] as HTMLDivElement;
+
       if (window.innerWidth > this.mobileSize) {
         window.scrollTo({ top: 0, behavior: "smooth" });
-        this.slides[this.currentSlide].style.zIndex = "1";
+        currentSlide.style.zIndex = "1";
 
         for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
+          const slide = this.slides[index] as HTMLDivElement;
 
           if (this.currentSlide === index) {
             slide.setAttribute("aria-hidden", "false");
@@ -102,27 +141,26 @@ class MultiScroll {
           }
         }
       } else {
-        this.slides[this.currentSlide].style.zIndex = "";
+        currentSlide.style.zIndex = "";
 
         for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
-
+          const slide = this.slides[index] as HTMLDivElement;
           slide.removeAttribute("aria-hidden");
         }
       }
     });
   }
 
-  navigateNavButtons() {
+  private navigateNavButtons(): void {
     for (let index = 0; index < this.totalNavButtons; index++) {
-      const navButton = this.navButtons[index];
+      const navButton = this.navButtons[index] as HTMLButtonElement;
 
       navButton.addEventListener("click", () => {
         if (this.isWheelEventDelay === true) {
           if (window.innerWidth > this.mobileSize) {
-            const slideNavNumber = navButton.getAttribute(this.navDatasetAttribute);
-            const slideSelected = parseInt(slideNavNumber);
-            const slideComparison = Math.abs(this.currentSlide - slideSelected);
+            const slideNavNumber: string = navButton.getAttribute(this.navDatasetAttribute)!;
+            const slideSelected: number = parseInt(slideNavNumber);
+            const slideComparison: number = Math.abs(this.currentSlide - slideSelected);
 
             if (slideComparison === 1) {
               if (this.currentSlide + 1 === slideSelected) {
@@ -149,13 +187,13 @@ class MultiScroll {
     }
   }
 
-  navigateMouseScroll() {
+  private navigateMouseScroll(): void {
     window.addEventListener(
       "wheel",
       (event) => {
         if (this.isWheelEventDelay === true) {
           if (window.innerWidth > this.mobileSize) {
-            const scrollValue = event.deltaY;
+            const scrollValue: number = event.deltaY;
 
             if (this.currentSlide !== this.totalSlides - 1 && scrollValue > 0) {
               this.oneTimeNavigate("bottom");
@@ -171,21 +209,21 @@ class MultiScroll {
     );
   }
 
-  navigateKeyboard() {
+  private navigateKeyboard(): void {
     window.addEventListener("keydown", (event) => {
       if (window.innerWidth >= this.mobileSize) {
         if (this.isKeyboardEventDelay === true) {
-          const keyboardKey = event.key.toLowerCase();
+          const keyboardKey: string = event.key.toLowerCase();
 
           this.isKeyboardEventDelay = false;
 
           if (this.currentSlide !== this.totalSlides - 1 && keyboardKey === "end") {
-            const slideComparison = Math.abs(this.currentSlide - this.totalSlides);
+            const slideComparison: number = Math.abs(this.currentSlide - this.totalSlides);
             this.multipleTimeNavigate("bottom", slideComparison, this.totalSlides);
           }
 
           if (this.currentSlide !== 0 && keyboardKey === "home") {
-            const slideComparison = Math.abs(this.currentSlide - 1);
+            const slideComparison: number = Math.abs(this.currentSlide - 1);
             this.multipleTimeNavigate("top", slideComparison, 1);
           }
 
@@ -209,17 +247,17 @@ class MultiScroll {
     });
   }
 
-  oneTimeNavigate(direction) {
+  private oneTimeNavigate(direction: string) {
     this.isWheelEventDelay = false;
 
     for (let index = 0; index < this.totalSlides; index++) {
-      const slideType = this.slides[index].getAttribute(this.slideDatasetAttribute);
+      const slideType: string = this.slides[index].getAttribute(this.slideDatasetAttribute)!;
 
       if (slideType === "multi") {
-        const leftSlide = this.slides[index].firstElementChild;
-        const rightSlide = this.slides[index].lastElementChild;
-        const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-        const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const leftSlide = this.slides[index].firstElementChild as HTMLDivElement;
+        const rightSlide = this.slides[index].lastElementChild as HTMLDivElement;
+        const translateYLeftSlide: number = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const translateYRightSlide: number = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
 
         if (direction === "bottom") {
           leftSlide.style.transform = `translateY(${translateYLeftSlide - 100}%)`;
@@ -233,8 +271,8 @@ class MultiScroll {
       }
 
       if (slideType === "full") {
-        const fullSlide = this.slides[index].firstElementChild;
-        const translateYFullSlide = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
+        const fullSlide = this.slides[index].firstElementChild as HTMLDivElement;
+        const translateYFullSlide: number = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
 
         if (direction === "bottom") {
           fullSlide.style.transform = `translateY(${translateYFullSlide - 100}%)`;
@@ -246,44 +284,56 @@ class MultiScroll {
       }
     }
 
-    this.slides[this.currentSlide].style.zIndex = "";
-    this.slides[this.currentSlide].setAttribute("aria-hidden", true);
+    let currentSlide = this.slides[this.currentSlide] as HTMLDivElement;
+    let currentNavButton = this.navButtons[this.currentSlide] as HTMLButtonElement;
+
+    currentSlide.style.zIndex = "";
+    currentSlide.setAttribute("aria-hidden", "true");
 
     if (direction === "bottom") {
-      this.slides[this.currentSlide].nextElementSibling.setAttribute("aria-hidden", false);
-      this.navButtons[this.currentSlide].classList.remove(this.activeNavBtnClassname);
+      const nextElement = currentSlide.nextElementSibling as HTMLDivElement;
+
+      nextElement.setAttribute("aria-hidden", "false")!;
+      currentNavButton.classList.remove(this.activeNavBtnClassname);
       this.currentSlide += 1;
     }
 
     if (direction === "top") {
-      this.slides[this.currentSlide].previousElementSibling.setAttribute("aria-hidden", false);
-      this.navButtons[this.currentSlide].classList.remove(this.activeNavBtnClassname);
+      const prevElement = currentSlide.previousElementSibling as HTMLDivElement;
+
+      prevElement.setAttribute("aria-hidden", "false");
+      currentNavButton.classList.remove(this.activeNavBtnClassname);
       this.currentSlide -= 1;
     }
 
-    this.navButtons[this.currentSlide].classList.add(this.activeNavBtnClassname);
-    this.navButtons[this.currentSlide].focus();
+    currentSlide = this.slides[this.currentSlide] as HTMLDivElement;
+    currentNavButton = this.navButtons[this.currentSlide] as HTMLButtonElement;
+
+    currentNavButton.classList.add(this.activeNavBtnClassname);
+    currentNavButton.focus();
 
     setTimeout(() => {
-      this.slides[this.currentSlide].style.zIndex = "1";
+      currentSlide.style.zIndex = "1";
       this.isWheelEventDelay = true;
     }, this.transitionDelayTime);
   }
 
-  multipleTimeNavigate(direction, slideComparison, choosenSlide) {
+  private multipleTimeNavigate(direction: string, slideComparison: number, choosenSlide: number) {
+    let currentSlide = this.slides[this.currentSlide] as HTMLDivElement;
+
     this.isWheelEventDelay = false;
-    this.slides[this.currentSlide].style.zIndex = "";
+    currentSlide.style.zIndex = "";
 
     for (let index = 0; index < slideComparison; index++) {
       for (let innerIndex = 0; innerIndex < this.totalSlides; innerIndex++) {
-        const slide = this.slides[innerIndex];
-        const slideType = slide.getAttribute(this.slideDatasetAttribute);
+        const slide = this.slides[innerIndex] as HTMLDivElement;
+        const slideType: string = slide.getAttribute(this.slideDatasetAttribute)!;
 
         if (slideType === "multi") {
-          const leftSlide = slide.firstElementChild;
-          const rightSlide = slide.lastElementChild;
-          const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
-          const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
+          const leftSlide = slide.firstElementChild as HTMLDivElement;
+          const rightSlide = slide.lastElementChild as HTMLDivElement;
+          const translateYLeftSlide: number = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
+          const translateYRightSlide: number = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
 
           if (direction === "top") {
             leftSlide.style.transform = `translateY(${translateYLeftSlide + 100}%)`;
@@ -297,8 +347,8 @@ class MultiScroll {
         }
 
         if (slideType === "full") {
-          const fullSlide = this.slides[innerIndex].firstElementChild;
-          const translateYFullSlide = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
+          const fullSlide = this.slides[innerIndex].firstElementChild as HTMLDivElement;
+          const translateYFullSlide: number = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
 
           if (direction === "top") {
             fullSlide.style.transform = `translateY(${translateYFullSlide + 100}%)`;
@@ -311,20 +361,22 @@ class MultiScroll {
       }
     }
 
-    this.slides[choosenSlide].setAttribute("aria-hidden", false);
-    this.slides[this.currentSlide].setAttribute("aria-hidden", true);
-    this.navButtons[this.currentSlide].classList.remove(this.activeNavBtnClassname);
+    let currentNavButton = this.navButtons[this.currentSlide] as HTMLButtonElement;
+
+    this.slides[choosenSlide].setAttribute("aria-hidden", "false");
+    currentSlide.setAttribute("aria-hidden", "true");
+    currentNavButton.classList.remove(this.activeNavBtnClassname);
 
     this.currentSlide = choosenSlide;
+    currentSlide = this.slides[this.currentSlide] as HTMLDivElement;
+    currentNavButton = this.navButtons[this.currentSlide] as HTMLButtonElement;
 
-    this.navButtons[this.currentSlide].classList.add(this.activeNavBtnClassname);
-    this.navButtons[this.currentSlide].focus();
+    currentNavButton.classList.add(this.activeNavBtnClassname);
+    currentNavButton.focus();
 
     setTimeout(() => {
-      this.slides[this.currentSlide].style.zIndex = "1";
+      currentSlide.style.zIndex = "1";
       this.isWheelEventDelay = true;
     }, this.transitionDelayTime);
   }
 }
-
-new MultiScroll(992);

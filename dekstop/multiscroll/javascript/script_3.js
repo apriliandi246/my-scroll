@@ -20,20 +20,41 @@ class MultiScroll {
   triggerFunctionalities() {
     this.slidesFirstRender();
     this.navButtonsFirstRender();
-    this.navigateMouseScroll();
     this.navigateKeyboard();
     this.navigateNavButtons();
     this.setAriaHiddenWhileResizing();
   }
 
-  navButtonsFirstRender() {
-    for (let index = 0; index < this.totalNavButtons; index++) {
-      const navButton = this.navButtons[index];
-
-      navButton.setAttribute(this.navDatasetAttribute, index);
-      navButton.setAttribute("aria-label", `to slide ${index}`);
-    }
+  generateWheelEvent(node) {
+    node.addEventListener("wheel", this.wheelEventHandler, {
+      once: true,
+      passive: true,
+    });
   }
+
+  wheelEventHandler = (event) => {
+    if (window.innerWidth > this.mobileSize) {
+      if (this.isWheelEventDelay === true) {
+        const scrollValue = event.deltaY;
+
+        if (this.currentSlide !== this.totalSlides - 1 && scrollValue > 0) {
+          this.oneTimeNavigate("bottom");
+        } else if (this.currentSlide !== 0 && scrollValue < 0) {
+          this.oneTimeNavigate("top");
+        } else {
+          if (this.currentSlide === 0 && scrollValue < 0) {
+            const firstSlide = this.slides[0];
+            this.generateWheelEvent(firstSlide);
+          }
+
+          if (this.currentSlide === this.totalSlides - 1 && scrollValue > 0) {
+            const lastSlide = this.slides[this.totalSlides - 1];
+            this.generateWheelEvent(lastSlide);
+          }
+        }
+      }
+    }
+  };
 
   slidesFirstRender() {
     const documentEl = document.documentElement;
@@ -48,6 +69,8 @@ class MultiScroll {
       const rightSlideContent = slide.lastElementChild;
       const totalSlideContent = slide.childElementCount;
 
+      this.generateWheelEvent(slide);
+
       if (totalSlideContent === 1) {
         slide.setAttribute(this.slideDatasetAttribute, "full");
         leftSlideContent.style.transform = `translateY(${index}00%)`;
@@ -60,17 +83,17 @@ class MultiScroll {
       }
 
       if (window.innerWidth > this.mobileSize) {
-        slide.style.zIndex = "1";
+        this.slides[0].style.zIndex = "1";
 
         for (let index = 0; index < this.totalSlides; index++) {
           const slide = this.slides[index];
 
           if (index === 0) {
-            slide.setAttribute("aria-hidden", "false");
+            slide.setAttribute("aria-hidden", false);
           }
 
           if (index !== 0) {
-            slide.setAttribute("aria-hidden", "true");
+            slide.setAttribute("aria-hidden", true);
           }
         }
       }
@@ -78,146 +101,27 @@ class MultiScroll {
       if (window.innerWidth < this.mobileSize) {
         for (let index = 0; index < this.totalSlides; index++) {
           const slide = this.slides[index];
-          slide.removeAttribute("aria-hidden");
-        }
-      }
-    }
-  }
-
-  setAriaHiddenWhileResizing() {
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > this.mobileSize) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        this.slides[this.currentSlide].style.zIndex = "1";
-
-        for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
-
-          if (this.currentSlide === index) {
-            slide.setAttribute("aria-hidden", "false");
-          }
-
-          if (this.currentSlide !== index) {
-            slide.setAttribute("aria-hidden", "true");
-          }
-        }
-      } else {
-        this.slides[this.currentSlide].style.zIndex = "";
-
-        for (let index = 0; index < this.totalSlides; index++) {
-          const slide = this.slides[index];
 
           slide.removeAttribute("aria-hidden");
         }
       }
-    });
-  }
-
-  navigateNavButtons() {
-    for (let index = 0; index < this.totalNavButtons; index++) {
-      const navButton = this.navButtons[index];
-
-      navButton.addEventListener("click", () => {
-        if (this.isWheelEventDelay === true) {
-          if (window.innerWidth > this.mobileSize) {
-            const slideNavNumber = navButton.getAttribute(this.navDatasetAttribute);
-            const slideSelected = parseInt(slideNavNumber);
-            const slideComparison = Math.abs(this.currentSlide - slideSelected);
-
-            if (slideComparison === 1) {
-              if (this.currentSlide + 1 === slideSelected) {
-                this.oneTimeNavigate("bottom");
-              }
-
-              if (this.currentSlide - 1 === slideSelected) {
-                this.oneTimeNavigate("top");
-              }
-            }
-
-            if (slideComparison > 1) {
-              if (this.currentSlide !== this.totalSlides - 1 && slideSelected > this.currentSlide) {
-                this.multipleTimeNavigate("bottom", slideComparison, slideSelected);
-              }
-
-              if (this.currentSlide !== 0 && slideSelected < this.currentSlide) {
-                this.multipleTimeNavigate("top", slideComparison, slideSelected);
-              }
-            }
-          }
-        }
-      });
     }
-  }
-
-  navigateMouseScroll() {
-    window.addEventListener(
-      "wheel",
-      (event) => {
-        if (this.isWheelEventDelay === true) {
-          if (window.innerWidth > this.mobileSize) {
-            const scrollValue = event.deltaY;
-
-            if (this.currentSlide !== this.totalSlides - 1 && scrollValue > 0) {
-              this.oneTimeNavigate("bottom");
-            }
-
-            if (this.currentSlide !== 0 && scrollValue < 0) {
-              this.oneTimeNavigate("top");
-            }
-          }
-        }
-      },
-      { passive: true }
-    );
-  }
-
-  navigateKeyboard() {
-    window.addEventListener("keydown", (event) => {
-      if (window.innerWidth >= this.mobileSize) {
-        if (this.isKeyboardEventDelay === true) {
-          const keyboardKey = event.key.toLowerCase();
-
-          this.isKeyboardEventDelay = false;
-
-          if (this.currentSlide !== this.totalSlides - 1 && keyboardKey === "end") {
-            const slideComparison = Math.abs(this.currentSlide - this.totalSlides);
-            this.multipleTimeNavigate("bottom", slideComparison, this.totalSlides);
-          }
-
-          if (this.currentSlide !== 0 && keyboardKey === "home") {
-            const slideComparison = Math.abs(this.currentSlide - 1);
-            this.multipleTimeNavigate("top", slideComparison, 1);
-          }
-
-          if (keyboardKey === "arrowdown" || keyboardKey === "pagedown") {
-            if (this.currentSlide !== this.totalSlides - 1) {
-              this.oneTimeNavigate("bottom");
-            }
-          }
-
-          if (keyboardKey === "arrowup" || keyboardKey === "pageup") {
-            if (this.currentSlide !== 0) {
-              this.oneTimeNavigate("top");
-            }
-          }
-
-          setTimeout(() => {
-            this.isKeyboardEventDelay = true;
-          }, this.transitionDelayTime);
-        }
-      }
-    });
   }
 
   oneTimeNavigate(direction) {
     this.isWheelEventDelay = false;
 
     for (let index = 0; index < this.totalSlides; index++) {
-      const slideType = this.slides[index].getAttribute(this.slideDatasetAttribute);
+      const slide = this.slides[index];
+      const slideType = slide.getAttribute(this.slideDatasetAttribute);
+
+      if (this.currentSlide !== index) {
+        this.generateWheelEvent(slide);
+      }
 
       if (slideType === "multi") {
-        const leftSlide = this.slides[index].firstElementChild;
-        const rightSlide = this.slides[index].lastElementChild;
+        const leftSlide = slide.firstElementChild;
+        const rightSlide = slide.lastElementChild;
         const translateYLeftSlide = parseInt(leftSlide.style.transform.replace(/[^-\d.]/g, ""));
         const translateYRightSlide = parseInt(rightSlide.style.transform.replace(/[^-\d.]/g, ""));
 
@@ -233,7 +137,7 @@ class MultiScroll {
       }
 
       if (slideType === "full") {
-        const fullSlide = this.slides[index].firstElementChild;
+        const fullSlide = slide.firstElementChild;
         const translateYFullSlide = parseInt(fullSlide.style.transform.replace(/[^-\d.]/g, ""));
 
         if (direction === "bottom") {
@@ -278,6 +182,8 @@ class MultiScroll {
       for (let innerIndex = 0; innerIndex < this.totalSlides; innerIndex++) {
         const slide = this.slides[innerIndex];
         const slideType = slide.getAttribute(this.slideDatasetAttribute);
+
+        this.generateWheelEvent(slide);
 
         if (slideType === "multi") {
           const leftSlide = slide.firstElementChild;
@@ -324,6 +230,122 @@ class MultiScroll {
       this.slides[this.currentSlide].style.zIndex = "1";
       this.isWheelEventDelay = true;
     }, this.transitionDelayTime);
+  }
+
+  navButtonsFirstRender() {
+    for (let index = 0; index < this.totalNavButtons; index++) {
+      const navButton = this.navButtons[index];
+
+      navButton.setAttribute(this.navDatasetAttribute, index);
+      navButton.setAttribute("aria-label", `to slide ${index}`);
+    }
+  }
+
+  setAriaHiddenWhileResizing() {
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > this.mobileSize) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        this.slides[this.currentSlide].style.zIndex = "1";
+
+        for (let index = 0; index < this.totalSlides; index++) {
+          const slide = this.slides[index];
+
+          if (this.currentSlide === index) {
+            slide.setAttribute("aria-hidden", false);
+          }
+
+          if (this.currentSlide !== index) {
+            slide.setAttribute("aria-hidden", true);
+          }
+        }
+      } else {
+        this.slides[this.currentSlide].style.zIndex = "";
+
+        for (let index = 0; index < this.totalSlides; index++) {
+          const slide = this.slides[index];
+
+          slide.removeAttribute("aria-hidden");
+        }
+      }
+    });
+  }
+
+  navigateNavButtons() {
+    for (let index = 0; index < this.totalNavButtons; index++) {
+      const navButton = this.navButtons[index];
+
+      navButton.addEventListener("click", () => {
+        if (this.isWheelEventDelay === true) {
+          if (window.innerWidth > this.mobileSize) {
+            const slideNavNumber = navButton.getAttribute(this.navDatasetAttribute);
+            const slideSelected = parseInt(slideNavNumber);
+            const slideComparison = Math.abs(this.currentSlide - slideSelected);
+
+            if (slideComparison === 1) {
+              if (this.currentSlide + 1 === slideSelected) {
+                this.oneTimeNavigate("bottom");
+              }
+
+              if (this.currentSlide - 1 === slideSelected) {
+                this.oneTimeNavigate("top");
+              }
+            }
+
+            if (slideComparison > 1) {
+              if (this.currentSlide !== this.totalSlides - 1 && slideSelected > this.currentSlide) {
+                this.multipleTimeNavigate("bottom", slideComparison, slideSelected);
+              }
+
+              if (this.currentSlide !== 0 && slideSelected < this.currentSlide) {
+                this.multipleTimeNavigate("top", slideComparison, slideSelected);
+              }
+            }
+          }
+        }
+
+        return;
+      });
+    }
+  }
+
+  navigateKeyboard() {
+    window.addEventListener("keydown", (event) => {
+      if (window.innerWidth >= this.mobileSize) {
+        if (this.isKeyboardEventDelay === true) {
+          const keyboardKey = event.key.toLowerCase();
+
+          this.isKeyboardEventDelay = false;
+
+          if (this.currentSlide !== this.totalSlides - 1 && keyboardKey === "end") {
+            const slideComparison = Math.abs(this.currentSlide - this.totalSlides);
+
+            this.multipleTimeNavigate("bottom", slideComparison, this.totalSlides);
+          }
+
+          if (this.currentSlide !== 0 && keyboardKey === "home") {
+            const slideComparison = Math.abs(this.currentSlide - 1);
+
+            this.multipleTimeNavigate("top", slideComparison, 1);
+          }
+
+          if (keyboardKey === "arrowdown" || keyboardKey === "pagedown") {
+            if (this.currentSlide !== this.totalSlides - 1) {
+              this.oneTimeNavigate("bottom");
+            }
+          }
+
+          if (keyboardKey === "arrowup" || keyboardKey === "pageup") {
+            if (this.currentSlide !== 0) {
+              this.oneTimeNavigate("top");
+            }
+          }
+
+          setTimeout(() => {
+            this.isKeyboardEventDelay = true;
+          }, this.transitionDelayTime);
+        }
+      }
+    });
   }
 }
 

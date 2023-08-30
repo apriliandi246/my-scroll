@@ -1,3 +1,8 @@
+/*
+  💡 issue with navigate slide using button navigation and after using wheel event.
+    => slide becomes not predictable and not in correct position
+*/
+
 class MultiScroll {
   constructor(mobileSize) {
     this.currentSlide = 0;
@@ -13,6 +18,8 @@ class MultiScroll {
     this.totalSlides = this.slides.length;
     this.totalNavButtons = this.navButtons.length;
     this.transitionDelayTime;
+
+    this.controller = new AbortController();
 
     this.triggerFunctionalities();
   }
@@ -60,17 +67,17 @@ class MultiScroll {
       }
 
       if (window.innerWidth > this.mobileSize) {
-        slide.style.zIndex = "1";
+        this.slides[0].style.zIndex = "1";
 
         for (let index = 0; index < this.totalSlides; index++) {
           const slide = this.slides[index];
 
           if (index === 0) {
-            slide.setAttribute("aria-hidden", "false");
+            slide.setAttribute("aria-hidden", false);
           }
 
           if (index !== 0) {
-            slide.setAttribute("aria-hidden", "true");
+            slide.setAttribute("aria-hidden", true);
           }
         }
       }
@@ -78,6 +85,7 @@ class MultiScroll {
       if (window.innerWidth < this.mobileSize) {
         for (let index = 0; index < this.totalSlides; index++) {
           const slide = this.slides[index];
+
           slide.removeAttribute("aria-hidden");
         }
       }
@@ -94,11 +102,11 @@ class MultiScroll {
           const slide = this.slides[index];
 
           if (this.currentSlide === index) {
-            slide.setAttribute("aria-hidden", "false");
+            slide.setAttribute("aria-hidden", false);
           }
 
           if (this.currentSlide !== index) {
-            slide.setAttribute("aria-hidden", "true");
+            slide.setAttribute("aria-hidden", true);
           }
         }
       } else {
@@ -145,30 +153,30 @@ class MultiScroll {
             }
           }
         }
+
+        return;
       });
     }
   }
 
   navigateMouseScroll() {
-    window.addEventListener(
-      "wheel",
-      (event) => {
-        if (this.isWheelEventDelay === true) {
-          if (window.innerWidth > this.mobileSize) {
-            const scrollValue = event.deltaY;
+    const wheelHandler = (event) => {
+      if (this.isWheelEventDelay === true) {
+        if (window.innerWidth > this.mobileSize) {
+          const scrollValue = event.deltaY;
 
-            if (this.currentSlide !== this.totalSlides - 1 && scrollValue > 0) {
-              this.oneTimeNavigate("bottom");
-            }
+          if (this.currentSlide !== 0 && scrollValue < 0) {
+            this.oneTimeNavigate("top");
+          }
 
-            if (this.currentSlide !== 0 && scrollValue < 0) {
-              this.oneTimeNavigate("top");
-            }
+          if (this.currentSlide !== this.totalSlides - 1 && scrollValue > 0) {
+            this.oneTimeNavigate("bottom");
           }
         }
-      },
-      { passive: true }
-    );
+      }
+    };
+
+    window.addEventListener("wheel", wheelHandler, { passive: true });
   }
 
   navigateKeyboard() {
@@ -181,11 +189,13 @@ class MultiScroll {
 
           if (this.currentSlide !== this.totalSlides - 1 && keyboardKey === "end") {
             const slideComparison = Math.abs(this.currentSlide - this.totalSlides);
+
             this.multipleTimeNavigate("bottom", slideComparison, this.totalSlides);
           }
 
           if (this.currentSlide !== 0 && keyboardKey === "home") {
             const slideComparison = Math.abs(this.currentSlide - 1);
+
             this.multipleTimeNavigate("top", slideComparison, 1);
           }
 
