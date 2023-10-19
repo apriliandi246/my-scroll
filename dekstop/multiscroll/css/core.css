@@ -1,0 +1,76 @@
+:root {
+  --mys-multiscroll-slide-transition-duration: 600ms;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.mys-multiscroll-slide-container {
+  position: relative;
+}
+
+.mys-multiscroll-slide {
+  position: absolute;
+}
+
+.mys-multiscroll-slide,
+.mys-multiscroll-slide-container {
+  width: 100%;
+  height: 100%;
+}
+
+.mys-multiscroll-slide[data-mys-multiscroll-slide-type="multi"] {
+  display: flex;
+}
+
+.mys-multiscroll-slide__full {
+  width: 100%;
+}
+
+.mys-multiscroll-slide__multi {
+  width: 50%;
+}
+
+.mys-multiscroll-slide__full,
+.mys-multiscroll-slide__multi {
+  height: 100%;
+  position: relative;
+  transition: transform var(--mys-multiscroll-slide-transition-duration) ease-in-out;
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    width: auto;
+    height: auto;
+    overflow-y: visible;
+  }
+
+  .mys-multiscroll-slide {
+    z-index: auto;
+    position: static;
+  }
+
+  .mys-multiscroll-slide[data-mys-multiscroll-slide-type="multi"] {
+    display: block;
+  }
+
+  .mys-multiscroll-slide__full,
+  .mys-multiscroll-slide__multi {
+    width: 100%;
+    height: auto;
+    position: static;
+    transform: translateY(0%) !important;
+  }
+}
