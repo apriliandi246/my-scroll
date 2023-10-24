@@ -16,22 +16,25 @@ class Mulstiscroll {
 	constructor() {
 		this.#slideTransitionDuration;
 		this.#isSlideNavigating = false;
-		this.#isKeyboardEventDelay = true;
+		this.#isKeyboardEventDelay = false;
 		this.#CSSPixelMobileSize = 768;
 		this.#currentActiveSlideNumber = 0;
+
 		this.#slideNavBtnNumberDataAttr = "data-mys-multiscroll-nav";
 		this.#slideTypeDataAttr = "data-mys-multiscroll-slide-type";
 		this.#slideNavBtnActiveClassname = "mys-multiscroll-nav__btn--active";
 		this.#transitionDelayCSSVariable = "--mys-multiscroll-slide-transition-duration";
+
 		this.#slideElements = document.getElementsByClassName("mys-multiscroll-slide");
 		this.#slideNavBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
+
 		this.#totalSlideElements = this.#slideElements.length;
 		this.#totalSlideNavBtnElements = this.#slideNavBtnElements.length;
 
-		this.#main();
+		this.#run();
 	}
 
-	#main() {
+	#run() {
 		this.#setSlidesAriaHiddenMobileView();
 		this.#setSlideTransitionDuration();
 		this.#setSlidesAriaHiddenWhileResizing();
@@ -43,22 +46,20 @@ class Mulstiscroll {
 	#setSlideTransitionDuration() {
 		const rootHTML = document.documentElement;
 		const computedStyle = getComputedStyle(rootHTML);
-		const durationTime = parseInt(computedStyle.getPropertyValue(this.#transitionDelayCSSVariable));
+		const transitionTime = parseInt(computedStyle.getPropertyValue(this.#transitionDelayCSSVariable));
 
-		this.#slideTransitionDuration = durationTime;
+		this.#slideTransitionDuration = transitionTime;
 	}
 
 	#setSlidesAriaHiddenMobileView() {
-		const currentViewportWidth = window.innerWidth;
+		if (this.#isDekstopView() === true) return;
 
-		if (currentViewportWidth < this.#CSSPixelMobileSize) {
-			const currentActiveSlideElement = this.#slideElements[this.#currentActiveSlideNumber];
-			currentActiveSlideElement.style.removeProperty("z-index");
+		const currentActiveSlideElement = this.#slideElements[this.#currentActiveSlideNumber];
+		currentActiveSlideElement.style.removeProperty("z-index");
 
-			for (let index = 0; index < this.#totalSlideElements; index++) {
-				const slideElement = this.#slideElements[index];
-				slideElement.removeAttribute("aria-hidden");
-			}
+		for (let i = 0; i < this.#totalSlideElements; i++) {
+			const slideElement = this.#slideElements[i];
+			slideElement.removeAttribute("aria-hidden");
 		}
 	}
 
@@ -76,31 +77,30 @@ class Mulstiscroll {
 		}
 
 		const resizeEventHandler = () => {
-			const currentViewportWidth = window.innerWidth;
 			const currentActiveSlideElement = this.#slideElements[this.#currentActiveSlideNumber];
 
-			if (currentViewportWidth > this.#CSSPixelMobileSize) {
-				window.scrollTo({ top: 0, behavior: "smooth" });
+			if (this.#isDekstopView() === true) {
+				window.scrollTo({ top: 0 });
 				currentActiveSlideElement.style.setProperty("z-index", "1");
 
-				for (let index = 0; index < this.#totalSlideElements; index++) {
-					const slideElement = this.#slideElements[index];
+				for (let i = 0; i < this.#totalSlideElements; i++) {
+					const slideElement = this.#slideElements[i];
 
-					if (this.#currentActiveSlideNumber === index) {
+					if (this.#currentActiveSlideNumber === i) {
 						slideElement.setAttribute("aria-hidden", "false");
 					}
 
-					if (this.#currentActiveSlideNumber !== index) {
+					if (this.#currentActiveSlideNumber !== i) {
 						slideElement.setAttribute("aria-hidden", "true");
 					}
 				}
 			}
 
-			if (currentViewportWidth < this.#CSSPixelMobileSize) {
+			if (this.#isDekstopView() === false) {
 				currentActiveSlideElement.style.removeProperty("z-index");
 
-				for (let index = 0; index < this.#totalSlideElements; index++) {
-					const slideElement = this.#slideElements[index];
+				for (let i = 0; i < this.#totalSlideElements; i++) {
+					const slideElement = this.#slideElements[i];
 					slideElement.removeAttribute("aria-hidden");
 				}
 			}
@@ -109,243 +109,90 @@ class Mulstiscroll {
 		window.addEventListener("resize", debounce(resizeEventHandler, 300));
 	}
 
-	#oneTimeSlidingSlide(direction) {
-		this.#isSlideNavigating = true;
-
-		for (let index = 0; index < this.#totalSlideElements; index++) {
-			const slideElement = this.#slideElements[index];
-			const slideElementType = slideElement.getAttribute(this.#slideTypeDataAttr);
-
-			if (slideElementType === "multi") {
-				const leftSlideElement = slideElement.firstElementChild;
-				const leftSlideElTransformValue = leftSlideElement.style.getPropertyValue("transform");
-				const leftSlideElTranslateYPosition = parseInt(leftSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-				const rightSlideElement = slideElement.lastElementChild;
-				const rightSlideElTransformValue = rightSlideElement.style.getPropertyValue("transform");
-				const rightSlideElTranslateYPosition = parseInt(rightSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-				if (direction === "bottom") {
-					leftSlideElement.style.setProperty("transform", `translateY(${leftSlideElTranslateYPosition - 100}%)`);
-					rightSlideElement.style.setProperty("transform", `translateY(${rightSlideElTranslateYPosition + 100}%)`);
-				}
-
-				if (direction === "top") {
-					leftSlideElement.style.setProperty("transform", `translateY(${leftSlideElTranslateYPosition + 100}%)`);
-					rightSlideElement.style.setProperty("transform", `translateY(${rightSlideElTranslateYPosition - 100}%)`);
-				}
-			}
-
-			if (slideElementType === "full") {
-				const fullSlideElement = slideElement.firstElementChild;
-				const fullSlideElTransformValue = fullSlideElement.style.getPropertyValue("transform");
-				const fullSlideElTranslateYPosition = parseInt(fullSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-				if (direction === "bottom") {
-					fullSlideElement.style.setProperty("transform", `translateY(${fullSlideElTranslateYPosition - 100}%)`);
-				}
-
-				if (direction === "top") {
-					fullSlideElement.style.setProperty("transform", `translateY(${fullSlideElTranslateYPosition + 100}%)`);
-				}
-			}
-		}
-
-		this.#slideElements[this.#currentActiveSlideNumber].style.removeProperty("z-index");
-		this.#slideElements[this.#currentActiveSlideNumber].setAttribute("aria-hidden", "true");
-
-		if (direction === "bottom") {
-			const nextSlideElement = this.#slideElements[this.#currentActiveSlideNumber].nextElementSibling;
-			nextSlideElement.setAttribute("aria-hidden", "false");
-
-			this.#currentActiveSlideNumber += 1;
-		}
-
-		if (direction === "top") {
-			const previosSlideElement = this.#slideElements[this.#currentActiveSlideNumber].previousElementSibling;
-			previosSlideElement.setAttribute("aria-hidden", "false");
-
-			this.#currentActiveSlideNumber -= 1;
-		}
-
-		setTimeout(() => {
-			this.#slideElements[this.#currentActiveSlideNumber].style.setProperty("z-index", "1");
-			this.#isSlideNavigating = false;
-		}, this.#slideTransitionDuration);
-	}
-
-	#multipleTimeSlidingSlide(direction, slideComparison, choosenSlideNumber) {
-		this.#isSlideNavigating = true;
-		this.#slideElements[this.#currentActiveSlideNumber].style.removeProperty("z-index");
-
-		for (let index = 0; index < slideComparison; index++) {
-			for (let innerIndex = 0; innerIndex < this.#totalSlideElements; innerIndex++) {
-				const slideElement = this.#slideElements[innerIndex];
-				const slideElementype = slideElement.getAttribute(this.#slideTypeDataAttr);
-
-				if (slideElementype === "multi") {
-					const leftSlideElement = slideElement.firstElementChild;
-					const leftSlideElTransformValue = leftSlideElement.style.getPropertyValue("transform");
-					const leftSlideElTranslateYPosition = parseInt(leftSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-					const rightSlideElement = slideElement.lastElementChild;
-					const rightSlideElTransformValue = rightSlideElement.style.getPropertyValue("transform");
-					const rightSlideElTranslateYPosition = parseInt(rightSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-					if (direction === "bottom") {
-						leftSlideElement.style.setProperty(
-							"transform",
-							`translateY(${leftSlideElTranslateYPosition - 100}%)`
-						);
-						rightSlideElement.style.setProperty(
-							"transform",
-							`translateY(${rightSlideElTranslateYPosition + 100}%)`
-						);
-					}
-
-					if (direction === "top") {
-						leftSlideElement.style.setProperty(
-							"transform",
-							`translateY(${leftSlideElTranslateYPosition + 100}%)`
-						);
-						rightSlideElement.style.setProperty(
-							"transform",
-							`translateY(${rightSlideElTranslateYPosition - 100}%)`
-						);
-					}
-				}
-
-				if (slideElementype === "full") {
-					const fullSlideElement = slideElement.firstElementChild;
-					const fullSlideElTransformValue = fullSlideElement.style.getPropertyValue("transform");
-					const fullSlideElTranslateYPosition = parseInt(fullSlideElTransformValue.replace(/[^-\d.]/g, ""));
-
-					if (direction === "bottom") {
-						fullSlideElement.style.setProperty(
-							"transform",
-							`translateY(${fullSlideElTranslateYPosition - 100}%)`
-						);
-					}
-
-					if (direction === "top") {
-						fullSlideElement.style.setProperty(
-							"transform",
-							`translateY(${fullSlideElTranslateYPosition + 100}%)`
-						);
-					}
-				}
-
-				this.#slideElements[choosenSlideNumber].setAttribute("aria-hidden", "false");
-				this.#slideElements[this.#currentActiveSlideNumber].setAttribute("aria-hidden", "true");
-
-				this.#currentActiveSlideNumber = choosenSlideNumber;
-
-				setTimeout(() => {
-					this.#slideElements[this.#currentActiveSlideNumber].style.setProperty("z-index", "1");
-					this.#isSlideNavigating = false;
-				}, this.#slideTransitionDuration);
-			}
-		}
-	}
-
 	#navigateSlideKeyboardEvent() {
-		window.addEventListener("keydown", (event) => {
-			const currentViewportWidth = window.innerWidth;
+		const keydownHandler = (event) => {
+			if (this.#isDekstopView() === false) return;
+			if (this.#isKeyboardEventDelay === true) return;
 
-			if (this.#isKeyboardEventDelay === true) {
-				if (currentViewportWidth > this.#CSSPixelMobileSize) {
-					this.#isKeyboardEventDelay = false;
+			const keyboardEventKey = event.key.toLowerCase();
+			const totalSlideElements = this.#totalSlideElements - 1;
 
-					const keyboardEventKey = event.key.toLowerCase();
-					const totalSlideElements = this.#totalSlideElements - 1;
+			this.#isKeyboardEventDelay = false;
+			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
 
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(
-						this.#slideNavBtnActiveClassname
-					);
-
-					if (keyboardEventKey === "end") {
-						if (this.#currentActiveSlideNumber !== totalSlideElements) {
-							const slideComparison = Math.abs(this.#currentActiveSlideNumber - totalSlideElements);
-							this.#multipleTimeSlidingSlide("bottom", slideComparison, this.#totalSlideElements);
-						}
-					}
-
-					if (keyboardEventKey === "home") {
-						if (this.#currentActiveSlideNumber !== 0) {
-							const slideComparison = Math.abs(totalSlideElements);
-							this.#multipleTimeSlidingSlide("top", slideComparison, 1);
-						}
-					}
-
-					if (keyboardEventKey === "arrowup" || keyboardEventKey === "pageup") {
-						if (this.#currentActiveSlideNumber !== 0) {
-							this.#oneTimeSlidingSlide("top");
-						}
-					}
-
-					if (keyboardEventKey === "arrowdown" || keyboardEventKey === "pagedown") {
-						if (this.#currentActiveSlideNumber !== totalSlideElements) {
-							this.#oneTimeSlidingSlide("bottom");
-						}
-					}
-
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(
-						this.#slideNavBtnActiveClassname
-					);
-
-					setTimeout(() => {
-						this.#isKeyboardEventDelay = true;
-					}, this.#slideTransitionDuration);
+			if (keyboardEventKey === "arrowup" || keyboardEventKey === "pageup") {
+				if (this.#currentActiveSlideNumber !== 0) {
+					this.#oneTimeSlidingSlide("top");
 				}
 			}
-		});
+
+			if (keyboardEventKey === "arrowdown" || keyboardEventKey === "pagedown") {
+				if (this.#currentActiveSlideNumber !== totalSlideElements) {
+					this.#oneTimeSlidingSlide("bottom");
+				}
+			}
+
+			if (keyboardEventKey === "home") {
+				if (this.#currentActiveSlideNumber !== 0) {
+					const slideComparison = Math.abs(totalSlideElements);
+					this.#multipleTimeSlidingSlide("top", slideComparison, 1);
+				}
+			}
+
+			if (keyboardEventKey === "end") {
+				if (this.#currentActiveSlideNumber !== totalSlideElements) {
+					const slideComparison = Math.abs(this.#currentActiveSlideNumber - totalSlideElements);
+					this.#multipleTimeSlidingSlide("bottom", slideComparison, this.#totalSlideElements);
+				}
+			}
+
+			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
+
+			setTimeout(() => {
+				this.#isKeyboardEventDelay = false;
+			}, this.#slideTransitionDuration);
+		};
+
+		document.addEventListener("keydown", keydownHandler);
 	}
 
 	#navigateSlideNavButtons() {
-		for (let index = 0; index < this.#totalSlideNavBtnElements; index++) {
-			const navBtnElement = this.#slideNavBtnElements[index];
+		for (let i = 0; i < this.#totalSlideNavBtnElements; i++) {
+			const navBtnElement = this.#slideNavBtnElements[i];
 
 			navBtnElement.addEventListener("click", () => {
-				const currentViewportWidth = window.innerWidth;
+				if (this.#isDekstopView() === false) return;
+				if (this.#isSlideNavigating === true) return;
 
-				if (this.#isSlideNavigating === false && currentViewportWidth > this.#CSSPixelMobileSize) {
-					const slideNavNumber = navBtnElement.getAttribute(this.#slideNavBtnNumberDataAttr);
-					const slideNavNumberInt = parseInt(slideNavNumber);
-					const slidesComparisonNumber = Math.abs(this.#currentActiveSlideNumber - slideNavNumberInt);
+				const slideNavNumber = navBtnElement.getAttribute(this.#slideNavBtnNumberDataAttr);
+				const slideNavNumberInt = parseInt(slideNavNumber);
+				const slidesComparisonNumber = Math.abs(this.#currentActiveSlideNumber - slideNavNumberInt);
 
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(
-						this.#slideNavBtnActiveClassname
-					);
+				this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
 
-					// if the comparison just one slide
-					if (slidesComparisonNumber === 1) {
-						if (this.#currentActiveSlideNumber + 1 === slideNavNumberInt) {
-							this.#oneTimeSlidingSlide("bottom");
-						}
-
-						if (this.#currentActiveSlideNumber - 1 === slideNavNumberInt) {
-							this.#oneTimeSlidingSlide("top");
-						}
+				// if the comparison just one slide
+				if (slidesComparisonNumber === 1) {
+					if (this.#currentActiveSlideNumber - 1 === slideNavNumberInt) {
+						this.#oneTimeSlidingSlide("top");
 					}
 
-					// if the comparison more than one slides
-					if (slidesComparisonNumber > 1) {
-						if (
-							this.#currentActiveSlideNumber !== this.#totalSlideElements - 1 &&
-							slideNavNumberInt > this.#currentActiveSlideNumber
-						) {
-							this.#multipleTimeSlidingSlide("bottom", slidesComparisonNumber, slideNavNumberInt);
-						}
-
-						if (this.#currentActiveSlideNumber !== 0 && slideNavNumberInt < this.#currentActiveSlideNumber) {
-							this.#multipleTimeSlidingSlide("top", slidesComparisonNumber, slideNavNumberInt);
-						}
+					if (this.#currentActiveSlideNumber + 1 === slideNavNumberInt) {
+						this.#oneTimeSlidingSlide("bottom");
 					}
-
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(
-						this.#slideNavBtnActiveClassname
-					);
 				}
+
+				// if the comparison more than one slides
+				if (slidesComparisonNumber > 1) {
+					if (this.#currentActiveSlideNumber !== 0 && slideNavNumberInt < this.#currentActiveSlideNumber) {
+						this.#multipleTimeSlidingSlide("top", slidesComparisonNumber, slideNavNumberInt);
+					}
+
+					if (this.#currentActiveSlideNumber !== this.#totalSlideElements - 1 && slideNavNumberInt > this.#currentActiveSlideNumber) {
+						this.#multipleTimeSlidingSlide("bottom", slidesComparisonNumber, slideNavNumberInt);
+					}
+				}
+
+				this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
 			});
 		}
 	}
@@ -368,35 +215,155 @@ class Mulstiscroll {
 		}
 
 		const wheelEventHandler = (event) => {
-			const currentViewportWidth = window.innerWidth;
+			if (this.#isDekstopView() === false) return;
+			if (this.#isSlideNavigating === true) return;
+			if (event.wheelDeltaY === 0) return;
 
-			if (this.#isSlideNavigating === false) {
-				if (currentViewportWidth > this.#CSSPixelMobileSize) {
-					const scrollEventValue = event.deltaY;
-					const totalSlideElements = this.#totalSlideElements - 1;
+			const totalSlideElements = this.#totalSlideElements - 1;
+			const isWheelToBottom = Math.sign(event.wheelDeltaY) === -1 ? true : false;
 
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(
-						this.#slideNavBtnActiveClassname
-					);
+			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
 
-					if (this.#currentActiveSlideNumber !== totalSlideElements && scrollEventValue > 0) {
-						this.#oneTimeSlidingSlide("bottom");
-					}
-
-					if (this.#currentActiveSlideNumber !== 0 && scrollEventValue < 0) {
-						this.#oneTimeSlidingSlide("top");
-					}
-
-					this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(
-						this.#slideNavBtnActiveClassname
-					);
+			if (isWheelToBottom === false) {
+				if (this.#currentActiveSlideNumber !== 0) {
+					this.#oneTimeSlidingSlide("top");
 				}
 			}
+
+			if (isWheelToBottom === true) {
+				if (this.#currentActiveSlideNumber !== totalSlideElements) {
+					this.#oneTimeSlidingSlide("bottom");
+				}
+			}
+
+			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
 		};
 
-		window.addEventListener("wheel", throttle(wheelEventHandler, 700), {
+		document.addEventListener("wheel", throttle(wheelEventHandler, 700), {
 			passive: true,
 		});
+	}
+
+	#oneTimeSlidingSlide(direction) {
+		this.#isSlideNavigating = true;
+
+		for (let i = 0; i < this.#totalSlideElements; i++) {
+			const slideElement = this.#slideElements[i];
+			const slideElementType = slideElement.getAttribute(this.#slideTypeDataAttr);
+
+			const firstSlideElement = slideElement.firstElementChild;
+			const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
+			const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+			if (slideElementType === "full") {
+				if (direction === "top") {
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+				}
+
+				if (direction === "bottom") {
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+				}
+			}
+
+			if (slideElementType === "multi") {
+				const secondSlideElement = slideElement.lastElementChild;
+				const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
+				const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+				if (direction === "top") {
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition - 100}%)`);
+				}
+
+				if (direction === "bottom") {
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition + 100}%)`);
+				}
+			}
+		}
+
+		this.#slideElements[this.#currentActiveSlideNumber].style.removeProperty("z-index");
+		this.#slideElements[this.#currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+
+		if (direction === "top") {
+			const previosSlideElement = this.#slideElements[this.#currentActiveSlideNumber].previousElementSibling;
+			previosSlideElement.setAttribute("aria-hidden", "false");
+
+			this.#currentActiveSlideNumber -= 1;
+		}
+
+		if (direction === "bottom") {
+			const nextSlideElement = this.#slideElements[this.#currentActiveSlideNumber].nextElementSibling;
+			nextSlideElement.setAttribute("aria-hidden", "false");
+
+			this.#currentActiveSlideNumber += 1;
+		}
+
+		setTimeout(() => {
+			this.#slideElements[this.#currentActiveSlideNumber].style.setProperty("z-index", "1");
+			this.#isSlideNavigating = false;
+		}, this.#slideTransitionDuration);
+	}
+
+	#multipleTimeSlidingSlide(direction, slideComparison, choosenSlideNumber) {
+		this.#isSlideNavigating = true;
+		this.#slideElements[this.#currentActiveSlideNumber].style.removeProperty("z-index");
+
+		for (let i = 0; i < slideComparison; i++) {
+			for (let j = 0; j < this.#totalSlideElements; j++) {
+				const slideElement = this.#slideElements[j];
+				const slideElementype = slideElement.getAttribute(this.#slideTypeDataAttr);
+
+				const firstSlideElement = slideElement.firstElementChild;
+				const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
+				const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+				if (slideElementype === "full") {
+					if (direction === "top") {
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+					}
+
+					if (direction === "bottom") {
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+					}
+				}
+
+				if (slideElementype === "multi") {
+					const secondSlideElement = slideElement.lastElementChild;
+					const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
+					const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+					if (direction === "top") {
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition - 100}%)`);
+					}
+
+					if (direction === "bottom") {
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition + 100}%)`);
+					}
+				}
+
+				this.#slideElements[choosenSlideNumber].setAttribute("aria-hidden", "false");
+				this.#slideElements[this.#currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+				this.#currentActiveSlideNumber = choosenSlideNumber;
+
+				setTimeout(() => {
+					this.#slideElements[this.#currentActiveSlideNumber].style.setProperty("z-index", "1");
+					this.#isSlideNavigating = false;
+				}, this.#slideTransitionDuration);
+			}
+		}
+	}
+
+	#isDekstopView() {
+		const currentViewportWidth = window.innerWidth;
+
+		if (currentViewportWidth > this.#CSSPixelMobileSize) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
