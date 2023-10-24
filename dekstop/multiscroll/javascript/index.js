@@ -217,10 +217,10 @@ class Mulstiscroll {
 		const wheelEventHandler = (event) => {
 			if (this.#isDekstopView() === false) return;
 			if (this.#isSlideNavigating === true) return;
-			if (event.wheelDeltaY === 0) return;
+			if (Math.abs(event.deltaY) === 0) return;
 
 			const totalSlideElements = this.#totalSlideElements - 1;
-			const isWheelToBottom = Math.sign(event.wheelDeltaY) === -1 ? true : false;
+			const isWheelToBottom = Math.sign(event.deltaY) === 1 ? true : false;
 
 			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
 
