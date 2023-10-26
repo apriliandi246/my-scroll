@@ -8,6 +8,7 @@ class Mulstiscroll {
 	#slideNavBtnNumberDataAttr;
 	#slideNavBtnActiveClassname;
 	#transitionDelayCSSVariable;
+	#slidesContainer;
 	#slideElements;
 	#slideNavBtnElements;
 	#totalSlideElements;
@@ -25,9 +26,10 @@ class Mulstiscroll {
 		this.#slideNavBtnActiveClassname = "mys-multiscroll-nav__btn--active";
 		this.#transitionDelayCSSVariable = "--mys-multiscroll-slide-transition-duration";
 
-		this.#slideElements = document.getElementsByClassName("mys-multiscroll-slide");
+		this.#slidesContainer = document.getElementById("mys-multiscroll-slide-container");
 		this.#slideNavBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
 
+		this.#slideElements = this.#slidesContainer.children;
 		this.#totalSlideElements = this.#slideElements.length;
 		this.#totalSlideNavBtnElements = this.#slideNavBtnElements.length;
 
@@ -44,11 +46,10 @@ class Mulstiscroll {
 	}
 
 	#setSlideTransitionDuration() {
-		const rootHTML = document.documentElement;
-		const computedStyle = getComputedStyle(rootHTML);
-		const transitionTime = parseInt(computedStyle.getPropertyValue(this.#transitionDelayCSSVariable));
+		const computedStyle = getComputedStyle(this.#slidesContainer);
+		const transitionSlideTime = computedStyle.getPropertyValue(this.#transitionDelayCSSVariable);
 
-		this.#slideTransitionDuration = transitionTime;
+		this.#slideTransitionDuration = parseInt(transitionSlideTime);
 	}
 
 	#setSlidesAriaHiddenMobileView() {

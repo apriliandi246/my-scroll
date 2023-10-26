@@ -1,7 +1,3 @@
-:root {
-	--mys-multiscroll-slide-transition-duration: 610ms;
-}
-
 *,
 *::before,
 *::after {
@@ -18,6 +14,8 @@ body {
 }
 
 .mys-multiscroll-slide-container {
+	--mys-multiscroll-slide-transition-duration: 610ms;
+
 	position: relative;
 }
 
