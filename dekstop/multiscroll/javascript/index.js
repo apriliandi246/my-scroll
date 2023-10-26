@@ -334,11 +334,15 @@ class Mulstiscroll {
 
 			if (slideElementType === "full") {
 				if (direction === "top") {
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+					const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
 				}
 
 				if (direction === "bottom") {
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+					const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
 				}
 			}
 
@@ -348,13 +352,19 @@ class Mulstiscroll {
 				const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
 
 				if (direction === "top") {
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
-					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition - 100}%)`);
+					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
 				}
 
 				if (direction === "bottom") {
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
-					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition + 100}%)`);
+					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
 				}
 			}
 		}
@@ -397,11 +407,15 @@ class Mulstiscroll {
 
 				if (slideElementype === "full") {
 					if (direction === "top") {
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
+						const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
 					}
 
 					if (direction === "bottom") {
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
+						const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
 					}
 				}
 
@@ -411,13 +425,19 @@ class Mulstiscroll {
 					const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
 
 					if (direction === "top") {
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition + 100}%)`);
-						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition - 100}%)`);
+						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
 					}
 
 					if (direction === "bottom") {
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideElTranslateYPosition - 100}%)`);
-						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideElTranslateYPosition + 100}%)`);
+						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
 					}
 				}
 
