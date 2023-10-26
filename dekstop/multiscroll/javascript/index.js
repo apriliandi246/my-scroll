@@ -64,18 +64,6 @@ class Mulstiscroll {
 	}
 
 	#setSlidesAriaHiddenWhileResizing() {
-		function debounce(func, delay) {
-			let timer;
-
-			return function () {
-				clearTimeout(timer);
-
-				timer = setTimeout(() => {
-					func.apply(this, arguments);
-				}, delay);
-			};
-		}
-
 		const resizeEventHandler = () => {
 			const currentActiveSlideElement = this.#slideElements[this.#currentActiveSlideNumber];
 
@@ -106,54 +94,106 @@ class Mulstiscroll {
 			}
 		};
 
+		const debounce = (func, delay) => {
+			let timer;
+
+			return function () {
+				clearTimeout(timer);
+
+				timer = setTimeout(() => {
+					func.apply(this, arguments);
+				}, delay);
+			};
+		};
+
 		window.addEventListener("resize", debounce(resizeEventHandler, 300));
 	}
 
 	#navigateSlideKeyboardEvent() {
-		const keydownHandler = (event) => {
-			if (this.#isDekstopView() === false) return;
-			if (this.#isKeyboardEventDelay === true) return;
+		const HOME = "Home";
+		const END = "End";
+		const ARROW_UP = "ArrowUp";
+		const ARROW_DOWN = "ArrowDown";
+		const PAGE_UP = "PageUp";
+		const PAGE_DOWN = "PageDown";
 
-			const keyboardEventKey = event.key.toLowerCase();
-			const totalSlideElements = this.#totalSlideElements - 1;
-
-			this.#isKeyboardEventDelay = false;
-			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
-
-			if (keyboardEventKey === "arrowup" || keyboardEventKey === "pageup") {
-				if (this.#currentActiveSlideNumber !== 0) {
-					this.#oneTimeSlidingSlide("top");
-				}
-			}
-
-			if (keyboardEventKey === "arrowdown" || keyboardEventKey === "pagedown") {
-				if (this.#currentActiveSlideNumber !== totalSlideElements) {
-					this.#oneTimeSlidingSlide("bottom");
-				}
-			}
-
-			if (keyboardEventKey === "home") {
-				if (this.#currentActiveSlideNumber !== 0) {
-					const slideComparison = Math.abs(totalSlideElements);
-					this.#multipleTimeSlidingSlide("top", slideComparison, 1);
-				}
-			}
-
-			if (keyboardEventKey === "end") {
-				if (this.#currentActiveSlideNumber !== totalSlideElements) {
-					const slideComparison = Math.abs(this.#currentActiveSlideNumber - totalSlideElements);
-					this.#multipleTimeSlidingSlide("bottom", slideComparison, this.#totalSlideElements);
-				}
-			}
-
-			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
-
+		const waitBtnNavSlide = () => {
 			setTimeout(() => {
 				this.#isKeyboardEventDelay = false;
 			}, this.#slideTransitionDuration);
 		};
 
-		document.addEventListener("keydown", keydownHandler);
+		const keydownHandler = (event) => {
+			if (this.#isDekstopView() === false) return;
+			if (this.#isKeyboardEventDelay === true) return;
+
+			const keyboardEventKey = event.key;
+			const totalSlideElements = this.#totalSlideElements - 1;
+
+			this.#isKeyboardEventDelay = false;
+
+			if (keyboardEventKey === ARROW_UP || keyboardEventKey === PAGE_UP) {
+				if (this.#currentActiveSlideNumber !== 0) {
+					this.#unActivatePrevBtnNav();
+					this.#oneTimeSlidingSlide("top");
+					this.#activateNextBtnNav();
+
+					waitBtnNavSlide();
+				}
+			}
+
+			if (keyboardEventKey === ARROW_DOWN || keyboardEventKey === PAGE_DOWN) {
+				if (this.#currentActiveSlideNumber !== totalSlideElements) {
+					this.#unActivatePrevBtnNav();
+					this.#oneTimeSlidingSlide("bottom");
+					this.#activateNextBtnNav();
+
+					waitBtnNavSlide();
+				}
+			}
+
+			if (keyboardEventKey === HOME) {
+				if (this.#currentActiveSlideNumber !== 0) {
+					const slideComparison = Math.abs(this.#currentActiveSlideNumber);
+
+					this.#unActivatePrevBtnNav();
+					this.#multipleTimeSlidingSlide("top", slideComparison, 0);
+					this.#activateNextBtnNav();
+
+					waitBtnNavSlide();
+				}
+			}
+
+			if (keyboardEventKey === END) {
+				if (this.#currentActiveSlideNumber !== totalSlideElements) {
+					const slideComparison = Math.abs(this.#currentActiveSlideNumber - totalSlideElements);
+
+					this.#unActivatePrevBtnNav();
+					this.#multipleTimeSlidingSlide("bottom", slideComparison, this.#totalSlideElements - 1);
+					this.#activateNextBtnNav();
+
+					waitBtnNavSlide();
+				}
+			}
+		};
+
+		const throttle = (func, delay) => {
+			let isCanRun = true;
+
+			return function () {
+				if (isCanRun === true) {
+					func.apply(this, arguments);
+
+					isCanRun = false;
+
+					setTimeout(() => {
+						isCanRun = true;
+					}, delay);
+				}
+			};
+		};
+
+		document.addEventListener("keydown", throttle(keydownHandler, this.#slideTransitionDuration));
 	}
 
 	#navigateSlideNavButtons() {
@@ -168,9 +208,11 @@ class Mulstiscroll {
 				const slideNavNumberInt = parseInt(slideNavNumber);
 				const slidesComparisonNumber = Math.abs(this.#currentActiveSlideNumber - slideNavNumberInt);
 
-				this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
+				this.#unActivatePrevBtnNav();
 
-				// if the comparison just one slide
+				/* 
+					If the comparison just one slide 
+				*/
 				if (slidesComparisonNumber === 1) {
 					if (this.#currentActiveSlideNumber - 1 === slideNavNumberInt) {
 						this.#oneTimeSlidingSlide("top");
@@ -181,7 +223,9 @@ class Mulstiscroll {
 					}
 				}
 
-				// if the comparison more than one slides
+				/* 
+					If the comparison more than one slides 
+				*/
 				if (slidesComparisonNumber > 1) {
 					if (this.#currentActiveSlideNumber !== 0 && slideNavNumberInt < this.#currentActiveSlideNumber) {
 						this.#multipleTimeSlidingSlide("top", slidesComparisonNumber, slideNavNumberInt);
@@ -192,54 +236,86 @@ class Mulstiscroll {
 					}
 				}
 
-				this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
+				this.#activateNextBtnNav();
 			});
 		}
 	}
 
 	#navigateSlideWheelEvent() {
-		function throttle(func, delay) {
-			let isCanRun = true;
+		const DELTA_THRESHOLD = 50;
+		const NOISE_THRESHOLD = 20;
+		const MINIMUM_TIME_STAMP = 300;
 
-			return function () {
-				if (isCanRun === true) {
-					func.apply(this, arguments);
-
-					isCanRun = false;
-
-					setTimeout(() => {
-						isCanRun = true;
-					}, delay);
-				}
-			};
-		}
+		let wheelPower = 0;
+		let wheelTimeStamp = 0;
+		let isWheelLock = false;
+		let wheelLockTimer = null;
 
 		const wheelEventHandler = (event) => {
 			if (this.#isDekstopView() === false) return;
-			if (this.#isSlideNavigating === true) return;
-			if (Math.abs(event.deltaY) === 0) return;
+			if (this.isSlideNavigating === true) return;
 
-			const totalSlideElements = this.#totalSlideElements - 1;
-			const isWheelToBottom = Math.sign(event.deltaY) === 1 ? true : false;
+			const delta = event.deltaY * -1;
+			const absDelta = Math.abs(delta);
+			const currentTimeStamp = event.timeStamp;
 
-			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
+			if (absDelta < NOISE_THRESHOLD) return;
+			if (currentTimeStamp - wheelTimeStamp < MINIMUM_TIME_STAMP && isWheelLock === true) return;
 
-			if (isWheelToBottom === false) {
-				if (this.#currentActiveSlideNumber !== 0) {
-					this.#oneTimeSlidingSlide("top");
+			wheelTimeStamp = currentTimeStamp;
+
+			if (wheelPower < absDelta && isWheelLock === false) {
+				/*
+					Scroll to top
+						- Swipe to bottom (for trackpad)
+				*/
+				if (delta > DELTA_THRESHOLD) {
+					if (this.#currentActiveSlideNumber !== 0) {
+						this.#unActivatePrevBtnNav();
+						this.#oneTimeSlidingSlide("top");
+						this.#activateNextBtnNav();
+					}
 				}
+
+				/*
+					Scroll to top
+						- Swipe to top (for trackpad)
+				*/
+				if (delta < -DELTA_THRESHOLD) {
+					if (this.#currentActiveSlideNumber !== this.#totalSlideElements - 1) {
+						this.#unActivatePrevBtnNav();
+						this.#oneTimeSlidingSlide("bottom");
+						this.#activateNextBtnNav();
+					}
+				}
+
+				lock(absDelta);
+
+				clearTimeout(wheelLockTimer);
+
+				wheelLockTimer = setTimeout(() => {
+					if (wheelPower !== absDelta) return;
+
+					unlock();
+				}, this.#slideTransitionDuration);
 			}
 
-			if (isWheelToBottom === true) {
-				if (this.#currentActiveSlideNumber !== totalSlideElements) {
-					this.#oneTimeSlidingSlide("bottom");
-				}
+			if (absDelta < DELTA_THRESHOLD && isWheelLock === true) {
+				unlock();
 			}
 
-			this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
+			function lock(absDelta) {
+				wheelPower = absDelta;
+				isWheelLock = true;
+			}
+
+			function unlock() {
+				wheelPower = DELTA_THRESHOLD;
+				isWheelLock = false;
+			}
 		};
 
-		document.addEventListener("wheel", throttle(wheelEventHandler, 700), {
+		document.addEventListener("wheel", wheelEventHandler, {
 			passive: true,
 		});
 	}
@@ -364,6 +440,14 @@ class Mulstiscroll {
 		} else {
 			return false;
 		}
+	}
+
+	#activateNextBtnNav() {
+		this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
+	}
+
+	#unActivatePrevBtnNav() {
+		this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
 	}
 }
 
