@@ -13,6 +13,10 @@ body {
 	overflow-x: hidden;
 }
 
+.mys-multiscroll-nav {
+	--mys-multiscroll-slide-transition-duration: 610ms;
+}
+
 .mys-multiscroll-slide-container {
 	--mys-multiscroll-slide-transition-duration: 610ms;
 
