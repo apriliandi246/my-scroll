@@ -14,7 +14,7 @@ body {
 }
 
 .mys-multiscroll-nav {
-	--mys-multiscroll-slide-transition-duration: 610ms;
+	--mys-multiscroll-nav-btn-transition-duration: 610ms;
 }
 
 .mys-multiscroll-slide-container {
