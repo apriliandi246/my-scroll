@@ -1,0 +1,47 @@
+.mys-slide {
+	color: #fff;
+	display: grid;
+	font-size: 44px;
+	place-items: center;
+	text-shadow: 1px 2px 3px #000;
+}
+
+.slide-1 {
+	background-color: #ff0000;
+}
+
+.slide-2 {
+	background-color: #0abbbb;
+}
+
+.slide-3 {
+	background-color: #0000ff;
+}
+
+.slide-4 {
+	background-color: #a52a2a;
+}
+
+.slide-5 {
+	background-color: #0da7aa;
+}
+
+.slide-6 {
+	background-color: #008000;
+}
+
+.slide-7 {
+	background-color: #59594f;
+}
+
+.slide-8 {
+	background-color: #1bec1b;
+}
+
+.slide-9 {
+	background-color: #383833;
+}
+
+.slide-10 {
+	background-color: #472f7a;
+}
