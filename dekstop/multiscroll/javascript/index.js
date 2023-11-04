@@ -464,11 +464,13 @@ class Mulstiscroll {
 	}
 
 	#activateNextBtnNav() {
-		this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.add(this.#slideNavBtnActiveClassname);
+		const navBtnActiveElement = this.#slideNavBtnElements[this.#currentActiveSlideNumber];
+		navBtnActiveElement.classList.add(this.#slideNavBtnActiveClassname);
 	}
 
 	#unActivatePrevBtnNav() {
-		this.#slideNavBtnElements[this.#currentActiveSlideNumber].classList.remove(this.#slideNavBtnActiveClassname);
+		const navBtnActiveElement = this.#slideNavBtnElements[this.#currentActiveSlideNumber];
+		navBtnActiveElement.classList.remove(this.#slideNavBtnActiveClassname);
 	}
 }
 
