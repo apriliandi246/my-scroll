@@ -1,199 +1,199 @@
-// class MultiScroll {
-// 	constructor(delayDuration, mobileSize) {
-// 		this.currentSlide = 0;
-// 		this.mobileSize = mobileSize;
-// 		this.isWheelEventDelay = true;
-// 		this.isKeyboardEventDelay = true;
-// 		this.delayDuration = delayDuration;
-// 		this.slides = document.getElementsByClassName("slide-wrapper");
-// 		this.slidesContainer = document.getElementById("slides-container");
+class MultiScroll {
+	constructor(delayDuration, mobileSize) {
+		this.currentSlide = 0;
+		this.mobileSize = mobileSize;
+		this.isWheelEventDelay = true;
+		this.isKeyboardEventDelay = true;
+		this.delayDuration = delayDuration;
+		this.slides = document.getElementsByClassName("slide-wrapper");
+		this.slidesContainer = document.getElementById("slides-container");
 
-// 		this.currentPositionValue = 0;
-// 		this.oneTimeSwipeDirectionResult = "none";
-// 		this.constantlySwipeDirectionResult = "none";
-// 		this.heightLayoutViewport = window.innerHeight;
+		this.currentPositionValue = 0;
+		this.oneTimeSwipeDirectionResult = "none";
+		this.constantlySwipeDirectionResult = "none";
+		this.heightLayoutViewport = window.innerHeight;
 
-// 		this.triggerFunctionalities();
-// 	}
+		this.triggerFunctionalities();
+	}
 
-// 	triggerFunctionalities() {
-// 		this.slidesFirstRender();
-// 		// this.mobileSwipeNavigate();
+	triggerFunctionalities() {
+		this.slidesFirstRender();
+		// this.mobileSwipeNavigate();
 
-// 		this.oneTimeSwipe();
-// 		this.constantlySwipe();
-// 	}
+		this.oneTimeSwipe();
+		this.constantlySwipe();
+	}
 
-// 	slidesFirstRender() {
-// 		let positionValue = 0;
-// 		this.slidesContainer.style.transform = `translateY(0)`;
+	slidesFirstRender() {
+		let positionValue = 0;
+		this.slidesContainer.style.transform = `translateY(0)`;
 
-// 		for (let index = 0; index < this.slides.length; index++) {
-// 			if (index === 0) {
-// 				this.slides[index].firstElementChild.style.transform = `translateY(0)`;
-// 			} else {
-// 				positionValue += this.heightLayoutViewport;
-// 				this.slides[index].firstElementChild.style.transform = `translateY(${positionValue}px)`;
-// 			}
-// 		}
-// 	}
+		for (let index = 0; index < this.slides.length; index++) {
+			if (index === 0) {
+				this.slides[index].firstElementChild.style.transform = `translateY(0)`;
+			} else {
+				positionValue += this.heightLayoutViewport;
+				this.slides[index].firstElementChild.style.transform = `translateY(${positionValue}px)`;
+			}
+		}
+	}
 
-// 	oneTimeSwipe() {
-// 		let touchendY = 0;
-// 		let touchstartY = 0;
+	oneTimeSwipe() {
+		let touchendY = 0;
+		let touchstartY = 0;
 
-// 		document.addEventListener("touchstart", (event) => {
-// 			touchstartY = event.changedTouches[0].screenY;
-// 		});
+		document.addEventListener("touchstart", (event) => {
+			touchstartY = event.changedTouches[0].screenY;
+		});
 
-// 		document.addEventListener("touchend", (event) => {
-// 			touchendY = event.changedTouches[0].screenY;
+		document.addEventListener("touchend", (event) => {
+			touchendY = event.changedTouches[0].screenY;
 
-// 			if (touchendY < touchstartY) {
-// 				this.oneTimeSwipeDirectionResult = "top";
-// 			}
+			if (touchendY < touchstartY) {
+				this.oneTimeSwipeDirectionResult = "top";
+			}
 
-// 			if (touchendY > touchstartY) {
-// 				this.oneTimeSwipeDirectionResult = "bottom";
-// 			}
+			if (touchendY > touchstartY) {
+				this.oneTimeSwipeDirectionResult = "bottom";
+			}
 
-// 			console.log(`onetime-${this.oneTimeSwipeDirectionResult}`);
-// 		});
-// 	}
+			console.log(`onetime-${this.oneTimeSwipeDirectionResult}`);
+		});
+	}
 
-// 	constantlySwipe() {
-// 		let prevScreenY = 0;
+	constantlySwipe() {
+		let prevScreenY = 0;
 
-// 		document.addEventListener("touchmove", (event) => {
-// 			const currentScreenY = event.changedTouches[0].screenY;
+		document.addEventListener("touchmove", (event) => {
+			const currentScreenY = event.changedTouches[0].screenY;
 
-// 			if (prevScreenY === 0) {
-// 				prevScreenY = event.changedTouches[0].screenY;
-// 			}
+			if (prevScreenY === 0) {
+				prevScreenY = event.changedTouches[0].screenY;
+			}
 
-// 			if (prevScreenY > currentScreenY) {
-// 				console.log("top");
-// 				this.constantlySwipeDirectionResult = "top";
-// 			}
+			if (prevScreenY > currentScreenY) {
+				console.log("top");
+				this.constantlySwipeDirectionResult = "top";
+			}
 
-// 			if (prevScreenY < currentScreenY) {
-// 				console.log("bottom");
-// 				this.constantlySwipeDirectionResult = "bottom";
-// 			}
+			if (prevScreenY < currentScreenY) {
+				console.log("bottom");
+				this.constantlySwipeDirectionResult = "bottom";
+			}
 
-// 			prevScreenY = currentScreenY;
-// 		});
+			prevScreenY = currentScreenY;
+		});
 
-// 		document.addEventListener("touchend", (event) => {
-// 			console.log(`constantly-${this.constantlySwipeDirectionResult}`);
-// 		});
-// 	}
+		document.addEventListener("touchend", (event) => {
+			console.log(`constantly-${this.constantlySwipeDirectionResult}`);
+		});
+	}
 
-// 	mobileSwipeNavigate() {
-// 		let prevScreenY = 0;
-// 		let swipeDirection = "none";
+	mobileSwipeNavigate() {
+		let prevScreenY = 0;
+		let swipeDirection = "none";
 
-// 		let swipingTopLimitValue = 0;
-// 		let swipingBottomLimitValue = 0;
+		let swipingTopLimitValue = 0;
+		let swipingBottomLimitValue = 0;
 
-// 		document.addEventListener("touchmove", (event) => {
-// 			const currentScreenY = event.changedTouches[0].screenY;
+		document.addEventListener("touchmove", (event) => {
+			const currentScreenY = event.changedTouches[0].screenY;
 
-// 			if (prevScreenY === 0) {
-// 				prevScreenY = currentScreenY;
-// 			}
+			if (prevScreenY === 0) {
+				prevScreenY = currentScreenY;
+			}
 
-// 			if (currentScreenY !== 0) {
-// 				// swipe to top
-// 				if (prevScreenY > currentScreenY) {
-// 					swipeDirection = "top";
+			if (currentScreenY !== 0) {
+				// swipe to top
+				if (prevScreenY > currentScreenY) {
+					swipeDirection = "top";
 
-// 					if (this.currentSlide === this.slides.length - 1 && swipingBottomLimitValue <= 60) {
-// 						swipingBottomLimitValue += 4;
-// 						this.slidesContainer.style.transform = `translateY(-${this.currentPositionValue + swipingBottomLimitValue}px)`;
-// 					}
-// 				}
+					if (this.currentSlide === this.slides.length - 1 && swipingBottomLimitValue <= 60) {
+						swipingBottomLimitValue += 4;
+						this.slidesContainer.style.transform = `translateY(-${this.currentPositionValue + swipingBottomLimitValue}px)`;
+					}
+				}
 
-// 				// swipe to bottom
-// 				if (prevScreenY < currentScreenY) {
-// 					swipeDirection = "bottom";
+				// swipe to bottom
+				if (prevScreenY < currentScreenY) {
+					swipeDirection = "bottom";
 
-// 					if (this.currentSlide === 0 && swipingTopLimitValue <= 60) {
-// 						swipingTopLimitValue += 4;
-// 						this.slidesContainer.style.transform = `translateY(${swipingTopLimitValue}px)`;
-// 					}
-// 				}
+					if (this.currentSlide === 0 && swipingTopLimitValue <= 60) {
+						swipingTopLimitValue += 4;
+						this.slidesContainer.style.transform = `translateY(${swipingTopLimitValue}px)`;
+					}
+				}
 
-// 				prevScreenY = currentScreenY;
-// 			}
-// 		});
+				prevScreenY = currentScreenY;
+			}
+		});
 
-// 		document.addEventListener("touchend", () => {
-// 			prevScreenY = 0;
+		document.addEventListener("touchend", () => {
+			prevScreenY = 0;
 
-// 			if (swipeDirection === "top") {
-// 				this.navigateSlide("top");
-// 			}
+			if (swipeDirection === "top") {
+				this.navigateSlide("top");
+			}
 
-// 			if (swipeDirection === "bottom") {
-// 				this.navigateSlide("bottom");
-// 			}
+			if (swipeDirection === "bottom") {
+				this.navigateSlide("bottom");
+			}
 
-// 			if (swipingTopLimitValue !== 0) {
-// 				swipingTopLimitValue = 0;
-// 				this.slidesContainer.classList.add("slide-transition-limit");
-// 				this.slidesContainer.style.transform = `translateY(${this.currentPositionValue}px)`;
+			if (swipingTopLimitValue !== 0) {
+				swipingTopLimitValue = 0;
+				this.slidesContainer.classList.add("slide-transition-limit");
+				this.slidesContainer.style.transform = `translateY(${this.currentPositionValue}px)`;
 
-// 				setTimeout(() => {
-// 					this.slidesContainer.classList.remove("slide-transition-limit");
-// 				}, 200);
-// 			}
+				setTimeout(() => {
+					this.slidesContainer.classList.remove("slide-transition-limit");
+				}, 200);
+			}
 
-// 			if (swipingBottomLimitValue !== 0) {
-// 				swipingBottomLimitValue = 0;
-// 				this.slidesContainer.classList.add("slide-transition-limit");
-// 				this.slidesContainer.style.transform = `translateY(-${this.currentPositionValue}px)`;
+			if (swipingBottomLimitValue !== 0) {
+				swipingBottomLimitValue = 0;
+				this.slidesContainer.classList.add("slide-transition-limit");
+				this.slidesContainer.style.transform = `translateY(-${this.currentPositionValue}px)`;
 
-// 				setTimeout(() => {
-// 					this.slidesContainer.classList.remove("slide-transition-limit");
-// 				}, 200);
-// 			}
+				setTimeout(() => {
+					this.slidesContainer.classList.remove("slide-transition-limit");
+				}, 200);
+			}
 
-// 			swipeDirection = "none";
-// 		});
-// 	}
+			swipeDirection = "none";
+		});
+	}
 
-// 	navigateSlide(direction) {
-// 		if (direction === "top") {
-// 			if (this.currentSlide !== this.slides.length - 1) {
-// 				let totalPositionValue = this.currentPositionValue + this.heightLayoutViewport;
+	navigateSlide(direction) {
+		if (direction === "top") {
+			if (this.currentSlide !== this.slides.length - 1) {
+				let totalPositionValue = this.currentPositionValue + this.heightLayoutViewport;
 
-// 				this.slidesContainer.classList.add("slide-transition-navigate");
-// 				this.currentPositionValue = totalPositionValue;
-// 				this.slidesContainer.style.transform = `translateY(-${totalPositionValue}px)`;
-// 				this.currentSlide += 1;
+				this.slidesContainer.classList.add("slide-transition-navigate");
+				this.currentPositionValue = totalPositionValue;
+				this.slidesContainer.style.transform = `translateY(-${totalPositionValue}px)`;
+				this.currentSlide += 1;
 
-// 				setTimeout(() => {
-// 					this.slidesContainer.classList.remove("slide-transition-navigate");
-// 				}, 300);
-// 			}
-// 		}
+				setTimeout(() => {
+					this.slidesContainer.classList.remove("slide-transition-navigate");
+				}, 300);
+			}
+		}
 
-// 		if (direction === "bottom") {
-// 			if (this.currentSlide !== 0) {
-// 				let totalPositionValue = this.currentPositionValue - this.heightLayoutViewport;
+		if (direction === "bottom") {
+			if (this.currentSlide !== 0) {
+				let totalPositionValue = this.currentPositionValue - this.heightLayoutViewport;
 
-// 				this.slidesContainer.classList.add("slide-transition-navigate");
-// 				this.currentPositionValue = totalPositionValue;
-// 				this.slidesContainer.style.transform = `translateY(-${totalPositionValue}px)`;
-// 				this.currentSlide -= 1;
+				this.slidesContainer.classList.add("slide-transition-navigate");
+				this.currentPositionValue = totalPositionValue;
+				this.slidesContainer.style.transform = `translateY(-${totalPositionValue}px)`;
+				this.currentSlide -= 1;
 
-// 				setTimeout(() => {
-// 					this.slidesContainer.classList.remove("slide-transition-navigate");
-// 				}, 300);
-// 			}
-// 		}
-// 	}
-// }
+				setTimeout(() => {
+					this.slidesContainer.classList.remove("slide-transition-navigate");
+				}, 300);
+			}
+		}
+	}
+}
 
-// new MultiScroll(600, 992);
+new MultiScroll(600, 992);

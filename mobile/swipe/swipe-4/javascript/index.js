@@ -31,7 +31,7 @@ class Swipe {
 		this.#slideTransitionDuration = parseInt(transitionSlideTime);
 	}
 
-	#swipingSlide(direction) {
+	#oneTimeSlidingSlide(direction) {
 		for (let i = 0; i < this.#totalSlideElements; i++) {
 			const slideElement = this.#slideElements[i];
 			const slideElementTransformValue = slideElement.style.getPropertyValue("transform");
@@ -62,6 +62,8 @@ class Swipe {
 		let swipeTopLimit = 0;
 		let swipeBottomlLimit = 0;
 
+		let swipeInteractTop = 0;
+
 		document.addEventListener("touchstart", (event) => {
 			clientYStart = event.changedTouches[0].clientY;
 		});
@@ -75,7 +77,7 @@ class Swipe {
 			*/
 			if (isSwipeToTop === true) {
 				if (this.#currentActiveSlideNumber !== this.#totalSlideElements - 1) {
-					this.#swipingSlide("bottom");
+					this.#oneTimeSlidingSlide("bottom");
 
 					this.#slidesContainer.style.setProperty("transform", "translateY(0)");
 					swipeTopLimit = 0;
@@ -90,7 +92,7 @@ class Swipe {
 			*/
 			if (isSwipeToTop === false) {
 				if (this.#currentActiveSlideNumber !== 0) {
-					this.#swipingSlide("top");
+					this.#oneTimeSlidingSlide("top");
 
 					this.#slidesContainer.style.setProperty("transform", "translateY(0)");
 					swipeBottomlLimit = 0;
@@ -105,8 +107,11 @@ class Swipe {
 			Make the slide little bit move when at the first and the last slide
 		*/
 		document.addEventListener("touchmove", (event) => {
-			console.log("ok");
 			const clientYMove = event.changedTouches[0].clientY;
+
+			if (clientYStart > clientYMove) {
+				swipeInteractTop += 1;
+			}
 
 			if (clientYStart < clientYMove && this.#currentActiveSlideNumber === 0) {
 				if (swipeBottomlLimit < 10) {
@@ -115,18 +120,6 @@ class Swipe {
 				}
 			}
 
-			/* Swipe to top */
-
-			/*
-				Swipe to top - Normal
-			*/
-			if (clientYStart > clientYMove && this.#currentActiveSlideNumber !== this.#totalSlideElements - 1) {
-				console.log("Ok");
-			}
-
-			/*
-				Swipe to top - Limit
-			*/
 			if (clientYStart > clientYMove && this.#currentActiveSlideNumber === this.#totalSlideElements - 1) {
 				if (swipeTopLimit < 10) {
 					swipeTopLimit += 1;
