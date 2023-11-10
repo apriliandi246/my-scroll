@@ -58,8 +58,8 @@ class Mulstiscroll {
 		const currentActiveSlideElement = this.#slideElements[this.#currentActiveSlideNumber];
 		currentActiveSlideElement.style.removeProperty("z-index");
 
-		for (let i = 0; i < this.#totalSlideElements; i++) {
-			const slideElement = this.#slideElements[i];
+		for (let slideIdx = 0; slideIdx < this.#totalSlideElements; slideIdx++) {
+			const slideElement = this.#slideElements[slideIdx];
 			slideElement.removeAttribute("aria-hidden");
 		}
 	}
@@ -72,14 +72,14 @@ class Mulstiscroll {
 				window.scrollTo({ top: 0 });
 				currentActiveSlideElement.style.setProperty("z-index", "1");
 
-				for (let i = 0; i < this.#totalSlideElements; i++) {
-					const slideElement = this.#slideElements[i];
+				for (let slideIdx = 0; slideIdx < this.#totalSlideElements; slideIdx++) {
+					const slideElement = this.#slideElements[slideIdx];
 
-					if (this.#currentActiveSlideNumber === i) {
+					if (this.#currentActiveSlideNumber === slideIdx) {
 						slideElement.setAttribute("aria-hidden", "false");
 					}
 
-					if (this.#currentActiveSlideNumber !== i) {
+					if (this.#currentActiveSlideNumber !== slideIdx) {
 						slideElement.setAttribute("aria-hidden", "true");
 					}
 				}
@@ -88,8 +88,8 @@ class Mulstiscroll {
 			if (this.#isDekstopView() === false) {
 				currentActiveSlideElement.style.removeProperty("z-index");
 
-				for (let i = 0; i < this.#totalSlideElements; i++) {
-					const slideElement = this.#slideElements[i];
+				for (let slideIdx = 0; slideIdx < this.#totalSlideElements; slideIdx++) {
+					const slideElement = this.#slideElements[slideIdx];
 					slideElement.removeAttribute("aria-hidden");
 				}
 			}
@@ -198,8 +198,8 @@ class Mulstiscroll {
 	}
 
 	#navigateSlideNavButtons() {
-		for (let i = 0; i < this.#totalSlideNavBtnElements; i++) {
-			const navBtnElement = this.#slideNavBtnElements[i];
+		for (let btnIdx = 0; btnIdx < this.#totalSlideNavBtnElements; btnIdx++) {
+			const navBtnElement = this.#slideNavBtnElements[btnIdx];
 
 			navBtnElement.addEventListener("click", () => {
 				if (this.#isDekstopView() === false) return;
@@ -324,8 +324,8 @@ class Mulstiscroll {
 	#oneTimeSlidingSlide(direction) {
 		this.#isSlideNavigating = true;
 
-		for (let i = 0; i < this.#totalSlideElements; i++) {
-			const slideElement = this.#slideElements[i];
+		for (let slideIdx = 0; slideIdx < this.#totalSlideElements; slideIdx++) {
+			const slideElement = this.#slideElements[slideIdx];
 			const slideElementType = slideElement.getAttribute(this.#slideTypeDataAttr);
 
 			const firstSlideElement = slideElement.firstElementChild;
@@ -396,9 +396,9 @@ class Mulstiscroll {
 		this.#isSlideNavigating = true;
 		this.#slideElements[this.#currentActiveSlideNumber].style.removeProperty("z-index");
 
-		for (let i = 0; i < slideComparison; i++) {
-			for (let j = 0; j < this.#totalSlideElements; j++) {
-				const slideElement = this.#slideElements[j];
+		for (let ii = 0; ii < slideComparison; ii++) {
+			for (let slideIdx = 0; slideIdx < this.#totalSlideElements; slideIdx++) {
+				const slideElement = this.#slideElements[slideIdx];
 				const slideElementype = slideElement.getAttribute(this.#slideTypeDataAttr);
 
 				const firstSlideElement = slideElement.firstElementChild;
