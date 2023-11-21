@@ -19,4 +19,4 @@ class Mulstiscroll {
 	}
 }
 
-new Mulstiscroll();
+export default Mulstiscroll;
