@@ -1,0 +1,20 @@
+{
+  "name": "scroll-swipe",
+  "version": "1.0.0",
+  "description": "🖱 scroll-swipe-functionalities",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --no-cache"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.23.3",
+    "@testing-library/dom": "^9.3.3",
+    "@testing-library/jest-dom": "^6.1.4",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0"
+  },
+  "type": "module"
+}

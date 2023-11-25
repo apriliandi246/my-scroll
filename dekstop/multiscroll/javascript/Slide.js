@@ -180,16 +180,28 @@ class Slide {
 			});
 		}
 
-		setTimeout(() => {
-			this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+		/*
+			🕵️‍♂️
+		*/
+		this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
 
-			setState({
-				type: "SLIDING-PROCESS",
-				values: {
-					isSlideNavigating: false,
-				},
-			});
-		}, this.slideTransitionDuration);
+		setState({
+			type: "SLIDING-PROCESS",
+			values: {
+				isSlideNavigating: false,
+			},
+		});
+
+		// setTimeout(() => {
+		// 	this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+
+		// 	setState({
+		// 		type: "SLIDING-PROCESS",
+		// 		values: {
+		// 			isSlideNavigating: false,
+		// 		},
+		// 	});
+		// }, this.slideTransitionDuration);
 	}
 
 	multipleTimeSlidingSlide(direction, slideComparison, choosenSlideNumber) {
@@ -249,8 +261,10 @@ class Slide {
 					}
 				}
 
-				this.#slideElements[choosenSlideNumber].setAttribute("aria-hidden", "false");
-				this.#slideElements[getState().currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+				if (getState().currentActiveSlideNumber !== choosenSlideNumber) {
+					this.#slideElements[choosenSlideNumber].setAttribute("aria-hidden", "false");
+					this.#slideElements[getState().currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+				}
 
 				setState({
 					type: "ACTIVE-SLIDE",
@@ -259,16 +273,28 @@ class Slide {
 					},
 				});
 
-				setTimeout(() => {
-					this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+				/*
+					🕵️‍♂️
+				*/
+				this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
 
-					setState({
-						type: "SLIDING-PROCESS",
-						values: {
-							isSlideNavigating: false,
-						},
-					});
-				}, this.slideTransitionDuration);
+				setState({
+					type: "SLIDING-PROCESS",
+					values: {
+						isSlideNavigating: false,
+					},
+				});
+
+				// setTimeout(() => {
+				// 	this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+
+				// 	setState({
+				// 		type: "SLIDING-PROCESS",
+				// 		values: {
+				// 			isSlideNavigating: false,
+				// 		},
+				// 	});
+				// }, this.slideTransitionDuration);
 			}
 		}
 	}

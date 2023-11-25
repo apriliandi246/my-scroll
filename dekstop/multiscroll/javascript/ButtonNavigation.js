@@ -36,6 +36,7 @@ class ButtonNavigation {
 
 				const { isSlideNavigating, currentActiveSlideNumber } = store.getState();
 
+				if (currentActiveSlideNumber === btnIdx) return;
 				if (isSlideNavigating === true) return;
 
 				const slideNavNumber = navBtnElement.getAttribute(this.#slideNavBtnNumberDataAttr);

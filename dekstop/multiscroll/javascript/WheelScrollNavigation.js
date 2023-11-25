@@ -57,7 +57,7 @@ class WheelScrollNavigation {
 				}
 
 				/*
-					Scroll to top
+					Scroll to bottom
 						- Swipe to top (for trackpad)
 				*/
 				if (delta < -DELTA_THRESHOLD) {

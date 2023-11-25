@@ -1,3 +1,5 @@
 TODO.txt
 some-test/
 build/
+node_modules/
+coverage/
