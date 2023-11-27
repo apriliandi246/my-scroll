@@ -57,7 +57,6 @@ class Slide {
 			const currentActiveSlideElement = this.#slideElements[currentActiveSlideNumber];
 
 			if (this.isDekstopView() === true) {
-				window.scrollTo({ top: 0 });
 				currentActiveSlideElement.style.setProperty("z-index", "1");
 
 				for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
@@ -191,17 +190,6 @@ class Slide {
 				isSlideNavigating: false,
 			},
 		});
-
-		// setTimeout(() => {
-		// 	this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
-
-		// 	setState({
-		// 		type: "SLIDING-PROCESS",
-		// 		values: {
-		// 			isSlideNavigating: false,
-		// 		},
-		// 	});
-		// }, this.slideTransitionDuration);
 	}
 
 	multipleTimeSlidingSlide(direction, slideComparison, choosenSlideNumber) {
@@ -284,17 +272,6 @@ class Slide {
 						isSlideNavigating: false,
 					},
 				});
-
-				// setTimeout(() => {
-				// 	this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
-
-				// 	setState({
-				// 		type: "SLIDING-PROCESS",
-				// 		values: {
-				// 			isSlideNavigating: false,
-				// 		},
-				// 	});
-				// }, this.slideTransitionDuration);
 			}
 		}
 	}
