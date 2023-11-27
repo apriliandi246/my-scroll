@@ -6,6 +6,7 @@ import setupCSS from "../utils/setupCSS.js";
 import setupHTML from "../utils/setupHTML.js";
 import setupStore from "../utils/setupStore.js";
 import getAriaHiddenAttr from "../utils/getAriaHiddenAttr.js";
+import isHasNoAriaHiddenAttr from "../utils/isHasNoAriaHiddenAttr.js";
 import isSlideElementHasZindex from "../utils/isSlideElementHasZindex.js";
 
 beforeEach(() => {
@@ -20,13 +21,9 @@ afterEach(() => {
 	jest.useRealTimers();
 });
 
-function isHasNoAriaHiddenAttr(element) {
-	return element.getAttribute("aria-hidden") === null ? true : false;
-}
-
 describe("Slide", () => {
 	describe("Mobile view - there is no important attributes when comes to mobile view for the slides (aria hidden equal false and z-index inline style)", () => {
-		test("Check the important attributes for all slides", () => {
+		test("check the important attributes for all slides", () => {
 			const originalInnerWidth = window.innerWidth;
 
 			window.innerWidth = 400;
@@ -49,7 +46,7 @@ describe("Slide", () => {
 	});
 
 	describe("Resizing window and check the active slide for dekstop and mobile view", () => {
-		test("Check on mobile view", () => {
+		test("check on mobile view", () => {
 			const mockFunc = jest.fn();
 			const originalInnerWidth = window.innerWidth;
 

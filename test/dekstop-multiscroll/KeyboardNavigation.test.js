@@ -24,26 +24,7 @@ afterEach(() => {
 
 describe("KeyboardNavigation", () => {
 	describe("Home - the first slide become the active slide", () => {
-		test("Active slide has important attributes (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "Home",
-			});
-
-			const firstSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
-
-			expect(getAriaHiddenAttr(firstSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(firstSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to the first number of the slide (start with zero)", () => {
+		test("the first slide should become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -58,26 +39,16 @@ describe("KeyboardNavigation", () => {
 
 			const firstSlideNumber = 0;
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
+			const firstSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
 
+			expect(getAriaHiddenAttr(firstSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(firstSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(firstSlideNumber);
 		});
 	});
 
 	describe("End - the last slide become the active slide", () => {
-		test("Active slide has important attributes (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			const lastSlideElement = document.querySelector(".mys-multiscroll-slide:last-child");
-
-			expect(getAriaHiddenAttr(lastSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(lastSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to the last number of the slide (start with zero)", () => {
+		test("the last slide should become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -86,14 +57,17 @@ describe("KeyboardNavigation", () => {
 
 			const slideElements = document.getElementsByClassName("mys-multiscroll-slide");
 			const lastSlideNumber = slideElements.length - 1;
+			const lastSlideElement = slideElements[lastSlideNumber];
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
+			expect(getAriaHiddenAttr(lastSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(lastSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(lastSlideNumber);
 		});
 	});
 
 	describe("Home and End - press End key after that press Home key", () => {
-		test("Active slide has important attributes for the first and the last slide (aria hidden equal false and z-index inline style)", () => {
+		test("the last slide is an active slide and after that the first slide is an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -110,6 +84,7 @@ describe("KeyboardNavigation", () => {
 
 			expect(getAriaHiddenAttr(lastSlideElement)).toBe(false);
 			expect(isSlideElementHasZindex(lastSlideElement)).toBe(true);
+			expect(store.getState().currentActiveSlideNumber).toBe(lastSlideNumber);
 
 			jest.advanceTimersByTime(610);
 
@@ -119,46 +94,12 @@ describe("KeyboardNavigation", () => {
 
 			expect(getAriaHiddenAttr(firstSlideElement)).toBe(false);
 			expect(isSlideElementHasZindex(firstSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to the current active slide number", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			const slides = document.getElementsByClassName("mys-multiscroll-slide");
-			const firstSlideNumber = 0;
-			const lastSlideNumber = slides.length - 1;
-
-			expect(store.getState().currentActiveSlideNumber).toBe(lastSlideNumber);
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "Home",
-			});
-
 			expect(store.getState().currentActiveSlideNumber).toBe(firstSlideNumber);
 		});
 	});
 
 	describe("ArrowDown - go to the next slide", () => {
-		test("Active slide has important attributes for the first and the last slide (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			const nextSlideElement = document.querySelector(".mys-multiscroll-slide:nth-child(2)");
-
-			expect(getAriaHiddenAttr(nextSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(nextSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to next slide number of the slide (start with zero)", () => {
+		test("the next slide become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -166,12 +107,15 @@ describe("KeyboardNavigation", () => {
 			});
 
 			const nextSlideNumber = 1;
+			const nextSlideElement = document.querySelector(".mys-multiscroll-slide:nth-child(2)");
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
+			expect(getAriaHiddenAttr(nextSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(nextSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(nextSlideNumber);
 		});
 
-		test("The last slide still an active slide if we press ArrowDown when the last slide is active", () => {
+		test("the last slide still an active slide if we press ArrowDown when the last slide is an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -196,34 +140,23 @@ describe("KeyboardNavigation", () => {
 	});
 
 	describe("PageDown - go to the next slide", () => {
-		test("Active slide has important attributes for the first and the last slide (aria hidden equal false and z-index inline style)", () => {
+		test("the next slide become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
 				key: "PageDown",
 			});
 
+			const nextSlideNumber = 1;
 			const nextSlideElement = document.querySelector(".mys-multiscroll-slide:nth-child(2)");
+			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
 			expect(getAriaHiddenAttr(nextSlideElement)).toBe(false);
 			expect(isSlideElementHasZindex(nextSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to next slide number of the slide (start with zero)", () => {
-			new Multiscroll();
-
-			const nextSlideNumber = 1;
-
-			fireEvent.keyDown(document, {
-				key: "PageDown",
-			});
-
-			const activeSlideNumber = store.getState().currentActiveSlideNumber;
-
 			expect(activeSlideNumber).toBe(nextSlideNumber);
 		});
 
-		test("The last slide still an active slide if we press PageDown when the last slide is active", () => {
+		test("the last slide still an active slide if we press PageDown when the last slide is an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -248,26 +181,7 @@ describe("KeyboardNavigation", () => {
 	});
 
 	describe("ArrowUp - go to the previous slide", () => {
-		test("Active slide has important attributes for the first and the last slide (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			const previousSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
-
-			expect(getAriaHiddenAttr(previousSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(previousSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to previous slide number of the slide (start with zero)", () => {
+		test("the first slide should become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -281,12 +195,15 @@ describe("KeyboardNavigation", () => {
 			});
 
 			const firstSlideNumber = 0;
+			const previousSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
+			expect(getAriaHiddenAttr(previousSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(previousSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(firstSlideNumber);
 		});
 
-		test("The first slide still an active slide if we press ArrowUp when the first slide is active", () => {
+		test("the first slide still an active slide if we press ArrowUp when the first slide is active", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -304,26 +221,7 @@ describe("KeyboardNavigation", () => {
 	});
 
 	describe("PageUp - go to the previous slide", () => {
-		test("Active slide has important attributes (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "PageUp",
-			});
-
-			const previousSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
-
-			expect(getAriaHiddenAttr(previousSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(previousSlideElement)).toBe(true);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to previous slide number of the slide (start with zero)", () => {
+		test("the first slide should become an active slidethe first slide should become an active slide", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -338,11 +236,14 @@ describe("KeyboardNavigation", () => {
 
 			const firstSlideNumber = 0;
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
+			const previousSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
 
+			expect(getAriaHiddenAttr(previousSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(previousSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(firstSlideNumber);
 		});
 
-		test("The first slide still an active slide if we press PageUp when the first slide is active", () => {
+		test("the first slide still an active slide if we press PageUp when the first slide is active", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
@@ -360,32 +261,8 @@ describe("KeyboardNavigation", () => {
 		});
 	});
 
-	describe("Stop others slide navigating process if the current process is not done yet (indicate with 'isSlideNavigating' in store state)", () => {
-		test("Active slide has important attributes (aria hidden equal false and z-index inline style)", () => {
-			new Multiscroll();
-
-			store.setState({
-				type: "SLIDING-PROCESS",
-				values: {
-					isSlideNavigating: true,
-				},
-			});
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			const firstSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
-			const secondSlideElement = document.querySelector(".mys-multiscroll-slide:nth-child(2)");
-
-			expect(getAriaHiddenAttr(firstSlideElement)).toBe(false);
-			expect(isSlideElementHasZindex(firstSlideElement)).toBe(true);
-
-			expect(getAriaHiddenAttr(secondSlideElement)).toBe(true);
-			expect(isSlideElementHasZindex(secondSlideElement)).toBe(false);
-		});
-
-		test("The store state of 'currentActiveSlideNumber' is equal to the first number of the slide (start with zero)", () => {
+	describe("Stop others slide navigating process if the current process is not done yet", () => {
+		test("the first slide should become an active slide", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -400,26 +277,35 @@ describe("KeyboardNavigation", () => {
 			});
 
 			const firstSlideNumber = 0;
+			const firstSlideElement = document.querySelector(".mys-multiscroll-slide:first-child");
+			const secondSlideElement = document.querySelector(".mys-multiscroll-slide:nth-child(2)");
 			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
+			expect(getAriaHiddenAttr(firstSlideElement)).toBe(false);
+			expect(getAriaHiddenAttr(secondSlideElement)).toBe(true);
+			expect(isSlideElementHasZindex(secondSlideElement)).toBe(false);
+			expect(isSlideElementHasZindex(firstSlideElement)).toBe(true);
 			expect(activeSlideNumber).toBe(firstSlideNumber);
 		});
 	});
 
 	describe("Keyboard navigation and button nav", () => {
-		test("Nav button is active as when navigating to others slide accordingly to the slide number", () => {
+		test("nav button is active accordingly when keyboard navigation in triggered", () => {
 			new Multiscroll();
 
 			fireEvent.keyDown(document, {
 				key: "ArrowDown",
 			});
 
+			const nextSlideNumber = 1;
 			const nextNavBtnElement = document.querySelector(".mys-multiscroll-nav__btn:nth-child(2)");
+			const activeSlideNumber = store.getState().currentActiveSlideNumber;
 
 			expect(isNavBtnElementHasActiveClass(nextNavBtnElement)).toBe(true);
+			expect(activeSlideNumber).toBe(nextSlideNumber);
 		});
 
-		test("Nothing happen for nav buttons if the elements is not exist in the DOM while keyboard navigation is triggered", () => {
+		test("nothing happen for nav buttons if the elements is not exist in the DOM while keyboard navigation is triggered", () => {
 			const navBtnContainer = document.querySelector(".mys-multiscroll-nav");
 			navBtnContainer.remove();
 
@@ -436,7 +322,7 @@ describe("KeyboardNavigation", () => {
 	});
 
 	describe("Mobile view - keyboard event won't work if the current viewport is mobile view", () => {
-		test("Won't do anything when keyboard navigation is triggered", () => {
+		test("won't do anything when keyboard navigation is triggered", () => {
 			const originalInnerWidth = window.innerWidth;
 
 			window.innerWidth = 400;
