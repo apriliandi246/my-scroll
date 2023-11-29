@@ -152,6 +152,9 @@ describe("WheelScrollNavigation", () => {
 	test("stop others slide navigating process if the current process is not done yet", () => {
 		new Multiscroll();
 
+		/*
+			Indicator if the process is not done yet
+		*/
 		store.setState({
 			type: "SLIDING-PROCESS",
 			values: {

@@ -83,8 +83,8 @@ describe("ButtonNavigation", () => {
 
 		fireEvent.click(prevNavBtnElement);
 
-		expect(isNavBtnElementHasActiveClass(nextNavBtnElement)).toBe(false);
 		expect(isNavBtnElementHasActiveClass(prevNavBtnElement)).toBe(true);
+		expect(isNavBtnElementHasActiveClass(nextNavBtnElement)).toBe(false);
 		expect(store.getState().currentActiveSlideNumber).toBe(0);
 	});
 
@@ -129,7 +129,7 @@ describe("ButtonNavigation", () => {
 		}
 	});
 
-	test("navigate for each nav buttons and active slide change accordingly", () => {
+	test("navigate for each nav buttons and the active slide change accordingly", () => {
 		new Multiscroll();
 
 		const slideElements = document.getElementsByClassName("mys-multiscroll-slide");
@@ -173,18 +173,7 @@ describe("ButtonNavigation", () => {
 		expect(activeSlideNumber).toBe(0);
 	});
 
-	test("button navigation won't work when the button navigations is not on the DOM", () => {
-		const navBtnContainer = document.querySelector(".mys-multiscroll-nav");
-		navBtnContainer.remove();
-
-		new Multiscroll();
-
-		const navBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
-
-		expect(navBtnElements.length).toBe(0);
-	});
-
-	test("button navigation won't work if the current process is still processing (indicate with 'isSlideNavigating' in store state)", () => {
+	test("stop others slide navigating process if the current process is not done yet", () => {
 		new Multiscroll();
 
 		store.setState({
@@ -202,6 +191,17 @@ describe("ButtonNavigation", () => {
 
 		expect(isNavBtnElementHasActiveClass(secondNavBtnElement)).toBe(false);
 		expect(activeSlideNumber).toBe(0);
+	});
+
+	test("button navigation won't work when the button navigations is not on the DOM", () => {
+		const navBtnContainer = document.querySelector(".mys-multiscroll-nav");
+		navBtnContainer.remove();
+
+		new Multiscroll();
+
+		const navBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
+
+		expect(navBtnElements.length).toBe(0);
 	});
 
 	test("button navigation won't work when comes to mobile view", () => {
