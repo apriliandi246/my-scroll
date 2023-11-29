@@ -72,23 +72,23 @@ class KeyboardNavigation {
 			}
 		};
 
-		const throttle = (func, delay) => {
-			let isCanRun = true;
+		document.addEventListener("keydown", this.#throttle(keydownHandler, this.#slide.slideTransitionDuration));
+	}
 
-			return function () {
-				if (isCanRun === true) {
-					func.apply(this, arguments);
+	#throttle(func, delay) {
+		let isCanRun = true;
 
-					isCanRun = false;
+		return function () {
+			if (isCanRun === true) {
+				func.apply(this, arguments);
 
-					setTimeout(() => {
-						isCanRun = true;
-					}, delay);
-				}
-			};
+				isCanRun = false;
+
+				setTimeout(() => {
+					isCanRun = true;
+				}, delay);
+			}
 		};
-
-		document.addEventListener("keydown", throttle(keydownHandler, this.#slide.slideTransitionDuration));
 	}
 }
 

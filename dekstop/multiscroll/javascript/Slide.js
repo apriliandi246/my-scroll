@@ -82,19 +82,19 @@ class Slide {
 			}
 		};
 
-		const debounce = (func, delay) => {
-			let timer;
+		window.addEventListener("resize", this.#debounce(resizeEventHandler, 300));
+	}
 
-			return function () {
-				clearTimeout(timer);
+	#debounce(func, delay) {
+		let timer;
 
-				timer = setTimeout(() => {
-					func.apply(this, arguments);
-				}, delay);
-			};
+		return function () {
+			clearTimeout(timer);
+
+			timer = setTimeout(() => {
+				func.apply(this, arguments);
+			}, delay);
 		};
-
-		window.addEventListener("resize", debounce(resizeEventHandler, 300));
 	}
 
 	oneTimeSlidingSlide(direction) {
