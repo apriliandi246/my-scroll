@@ -10,8 +10,12 @@
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-.slide-0-full {
-	background-color: #008000;
+.slide-0-left {
+	background-color: #daa520;
+}
+
+.slide-0-right {
+	background-color: #808080;
 }
 
 .slide-2-full {
