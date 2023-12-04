@@ -25,7 +25,7 @@ class Slide {
 
 	#run() {
 		this.#setSlideTransitionDuration();
-		this.#setSlidesAriaHiddenWhileResizing();
+		this.#setSlidesAttributesWhileResizing();
 		this.#setSlidesAriaHiddenMobileView();
 	}
 
@@ -51,7 +51,7 @@ class Slide {
 		}
 	}
 
-	#setSlidesAriaHiddenWhileResizing() {
+	#setSlidesAttributesWhileResizing() {
 		const resizeEventHandler = () => {
 			const { currentActiveSlideNumber } = store.getState();
 			const currentActiveSlideElement = this.#slideElements[currentActiveSlideNumber];
