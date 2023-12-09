@@ -20,14 +20,19 @@ afterEach(() => {
 });
 
 describe("WheelScrollNavigation - Integration Testing", () => {
-	test("go to the next slide", () => {
+	test("go to the next slide and the nav button and slide changes accordingly", () => {
 		new Multiscroll();
+
+		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
+		const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
 
 		const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
 
 		fireEvent.wheel(document, {
 			deltaY: 60,
 		});
+
+		expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
 		expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
 		expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
@@ -72,10 +77,11 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		}
 	});
 
-	test("wheel until the last slide and comback until at the first slide and nav buttons and slides changes accordingly", () => {
+	test("wheel until the last slide and come back until at the first slide and nav buttons and slides changes accordingly", () => {
 		new Multiscroll();
 
 		let prevNavBtnElement;
+
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
 		const totalSlideElements = slideElements.length;
@@ -123,8 +129,13 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		}
 	});
 
-	test("should do nothing if the deltaY value is not face the minimum value", () => {
+	test("should do nothing if the deltaY value is not face the minimum of the value", () => {
 		new Multiscroll();
+
+		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
+		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
+		const totalNavBtnElements = navBtnElements.length;
+		const firstNavBtnElement = navBtnElements[0];
 
 		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
 		const firstSlideElement = slideElements[0].parentElement.parentElement;
@@ -133,8 +144,16 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 			deltaY: 10,
 		});
 
+		expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+
 		expect(firstSlideElement).toHaveStyle({ zIndex: 1 });
 		expect(firstSlideElement).toHaveAttribute("aria-hidden", "false");
+
+		for (let btnIdx = 1; btnIdx < totalNavBtnElements; btnIdx++) {
+			const navBtnElement = navBtnElements[btnIdx];
+
+			expect(navBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+		}
 
 		for (let slideIdx = 1; slideIdx < slideElements.length; slideIdx++) {
 			const slideElement = slideElements[slideIdx].parentElement.parentElement;
@@ -146,6 +165,11 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 
 	test("should do nothing if other navigating process is not done yet", () => {
 		new Multiscroll();
+
+		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
+		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
+		const totalNavBtnElements = navBtnElements.length;
+		const firstNavBtnElement = navBtnElements[0];
 
 		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
 		const firstSlideElement = slideElements[0].parentElement.parentElement;
@@ -161,10 +185,16 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 			deltaY: 60,
 		});
 
-		jest.advanceTimersByTime(1000);
+		expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
 		expect(firstSlideElement).toHaveStyle({ zIndex: 1 });
 		expect(firstSlideElement).toHaveAttribute("aria-hidden", "false");
+
+		for (let btnIdx = 1; btnIdx < totalNavBtnElements; btnIdx++) {
+			const navBtnElement = navBtnElements[btnIdx];
+
+			expect(navBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+		}
 
 		for (let slideIdx = 1; slideIdx < slideElements.length; slideIdx++) {
 			const slideElement = slideElements[slideIdx].parentElement.parentElement;

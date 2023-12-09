@@ -53,21 +53,22 @@ describe("ButtonNavigation - Integration Test", () => {
 		}
 	});
 
-	test("navigate to next nav button and also the slides changes accordingly", () => {
+	test("navigate to next nav button and the nav button and slide changes accordingly", () => {
 		new Multiscroll();
 
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 		const currentActiveNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-		const nextActiveNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-		const nextSlideActiveElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
+		const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
 
-		fireEvent.click(nextActiveNavBtnElement);
+		const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
 
-		expect(nextActiveNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+		fireEvent.click(nextNavBtnElement);
+
+		expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 		expect(currentActiveNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 
-		expect(nextSlideActiveElement).toHaveStyle({ zIndex: 1 });
-		expect(nextSlideActiveElement).toHaveAttribute("aria-hidden", "false");
+		expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
+		expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
 	});
 
 	test("navigating until the last nav button and the slides and nav buttons changes accordingly", () => {
@@ -77,7 +78,7 @@ describe("ButtonNavigation - Integration Test", () => {
 		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
 
 		for (let btnIdx = 1; btnIdx < navBtnElements.length; btnIdx++) {
-			const nextNavBtnActiveElement = navBtnElements[btnIdx];
+			const nextNavBtnElement = navBtnElements[btnIdx];
 			const prevNavBtnActiveElement = navBtnElements[btnIdx - 1];
 
 			const prevRegexSlideSelector = new RegExp(`Slide ${btnIdx - 1} (Left|Full)`);
@@ -86,10 +87,10 @@ describe("ButtonNavigation - Integration Test", () => {
 			const nextRegexSlideSelector = new RegExp(`Slide ${btnIdx} (Left|Full)`);
 			const nextSlideActiveElement = screen.getByText(nextRegexSlideSelector).parentElement.parentElement;
 
-			fireEvent.click(nextNavBtnActiveElement);
+			fireEvent.click(nextNavBtnElement);
 
 			expect(prevNavBtnActiveElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			expect(nextNavBtnActiveElement).toHaveClass(ACTIVE_CLASSNAME);
+			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
 			expect(prevSlideActiveElement).not.toHaveStyle({ zIndex: 1 });
 			expect(prevSlideActiveElement).toHaveAttribute("aria-hidden", "true");

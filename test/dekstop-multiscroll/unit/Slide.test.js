@@ -23,6 +23,7 @@ describe("Slide", () => {
 
 		for (let slideIdx = 0; slideIdx < slideElements.length; slideIdx++) {
 			const slide = slideElements[slideIdx];
+
 			expect(slide).not.toHaveAttribute("aria-hidden");
 		}
 
@@ -41,6 +42,7 @@ describe("Slide", () => {
 
 		for (let slideIdx = 0; slideIdx < slideElements.length; slideIdx++) {
 			const slide = slideElements[slideIdx];
+
 			expect(slide).not.toHaveStyle({ zIndex: 1 });
 		}
 

@@ -29,7 +29,7 @@ describe("ButtonNavigation - Unit Test", () => {
 
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
-		const currentActiveNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
+		const currentActiveNavBtnElement = navBtnElements[0];
 
 		fireEvent.click(currentActiveNavBtnElement);
 
@@ -37,6 +37,7 @@ describe("ButtonNavigation - Unit Test", () => {
 
 		for (let btnIdx = 1; btnIdx < navBtnElements.length; btnIdx++) {
 			const navBtnElement = navBtnElements[btnIdx];
+
 			expect(navBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 		}
 	});
