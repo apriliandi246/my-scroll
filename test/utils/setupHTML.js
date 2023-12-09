@@ -151,10 +151,10 @@ const HTML_TEXT_SLIDES = `
    </main>
 `.trim();
 
-const HTML_TEXT_CODE = HTML_TEXT_BUTTON_NAVIGATIONS + HTML_TEXT_SLIDES;
+const HTML_TEXT_CODE = `<body>${HTML_TEXT_BUTTON_NAVIGATIONS + HTML_TEXT_SLIDES}</body>`;
 
-function injectHTML() {
+function setupHTML() {
 	document.body.innerHTML = HTML_TEXT_CODE;
 }
 
-export default injectHTML;
+export default setupHTML;

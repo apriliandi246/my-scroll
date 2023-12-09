@@ -3,20 +3,18 @@
 import store from "./store.js";
 
 class ButtonNavigation {
+	#slide;
 	#slideNavBtnElements;
 	#totalSlideNavBtnElements;
 	#slideNavBtnNumberDataAttr;
 	#slideNavBtnActiveClassname;
 
-	#slide;
-
 	constructor(slide) {
+		this.#slide = slide;
 		this.#slideNavBtnNumberDataAttr = "data-mys-multiscroll-nav";
 		this.#slideNavBtnActiveClassname = "mys-multiscroll-nav__btn--active";
 		this.#slideNavBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
 		this.#totalSlideNavBtnElements = this.#slideNavBtnElements.length;
-
-		this.#slide = slide;
 
 		this.#run();
 	}

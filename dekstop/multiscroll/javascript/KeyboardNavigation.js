@@ -78,9 +78,9 @@ class KeyboardNavigation {
 	#throttle(func, delay) {
 		let isCanRun = true;
 
-		return function () {
+		return function (...args) {
 			if (isCanRun === true) {
-				func.apply(this, arguments);
+				func.apply(this, args);
 
 				isCanRun = false;
 

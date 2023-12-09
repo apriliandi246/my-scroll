@@ -26,7 +26,7 @@ class Slide {
 	#run() {
 		this.#setSlideTransitionDuration();
 		this.#setSlidesAttributesWhileResizing();
-		this.#setSlidesAriaHiddenMobileView();
+		this.#setSlidesAttributesOnMobileView();
 	}
 
 	#setSlideTransitionDuration() {
@@ -37,7 +37,7 @@ class Slide {
 		this.slideTransitionDuration = transitionSlideTimeInt;
 	}
 
-	#setSlidesAriaHiddenMobileView() {
+	#setSlidesAttributesOnMobileView() {
 		if (this.isDekstopView() === true) return;
 
 		const { currentActiveSlideNumber } = store.getState();
@@ -88,11 +88,11 @@ class Slide {
 	#debounce(func, delay) {
 		let timer;
 
-		return function () {
+		return function (...args) {
 			clearTimeout(timer);
 
 			timer = setTimeout(() => {
-				func.apply(this, arguments);
+				func.apply(this, args);
 			}, delay);
 		};
 	}
