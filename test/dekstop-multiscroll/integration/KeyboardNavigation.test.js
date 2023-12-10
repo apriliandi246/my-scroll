@@ -184,6 +184,52 @@ describe("KeyboardNavigation - Integration Test", () => {
 				}
 			}
 		});
+
+		test("go to the next slide until at the last slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const totalSlides = slideElements.length;
+
+			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
+				if (slideIdx !== totalSlides - 1) {
+					fireEvent.keyDown(document, {
+						key: "ArrowDown",
+					});
+
+					jest.advanceTimersByTime(610);
+				}
+
+				if (slideIdx === totalSlides - 1) {
+					fireEvent.keyDown(document, {
+						key: "ArrowDown",
+					});
+				}
+
+				const nextSlideNumber = slideIdx;
+
+				expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+			}
+		});
+
+		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "ArrowDown",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+		});
 	});
 
 	describe("PageDown", () => {
@@ -312,6 +358,52 @@ describe("KeyboardNavigation - Integration Test", () => {
 				}
 			}
 		});
+
+		test("go to the next slide until at the last slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const totalSlides = slideElements.length;
+
+			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
+				if (slideIdx !== totalSlides - 1) {
+					fireEvent.keyDown(document, {
+						key: "PageDown",
+					});
+
+					jest.advanceTimersByTime(610);
+				}
+
+				if (slideIdx === totalSlides - 1) {
+					fireEvent.keyDown(document, {
+						key: "PageDown",
+					});
+				}
+
+				const nextSlideNumber = slideIdx;
+
+				expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+			}
+		});
+
+		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "PageDown",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+		});
 	});
 
 	describe("End", () => {
@@ -375,6 +467,38 @@ describe("KeyboardNavigation - Integration Test", () => {
 					expect(slideElement).toHaveAttribute("aria-hidden", "true");
 				}
 			}
+		});
+
+		test("go to the last slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const lastSlideNumber = slideElements.length - 1;
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			expect(store.getState().currentActiveSlideNumber).toBe(lastSlideNumber);
+		});
+
+		test("go to the last slide and the nav buttons and slides changes accordingly", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
@@ -508,6 +632,60 @@ describe("KeyboardNavigation - Integration Test", () => {
 				expect(slideElement).toHaveAttribute("aria-hidden", "true");
 			}
 		});
+
+		test("go to the next slide until at the first slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const totalSlides = slideElements.length;
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
+				if (slideIdx !== 1) {
+					fireEvent.keyDown(document, {
+						key: "ArrowUp",
+					});
+
+					jest.advanceTimersByTime(610);
+				}
+
+				if (slideIdx === 1) {
+					fireEvent.keyDown(document, {
+						key: "ArrowUp",
+					});
+				}
+
+				const nextSlideNumber = slideIdx - 1;
+
+				if (nextSlideNumber >= 0) {
+					expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+				}
+			}
+		});
+
+		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "ArrowUp",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+		});
 	});
 
 	describe("PageUp", () => {
@@ -640,6 +818,60 @@ describe("KeyboardNavigation - Integration Test", () => {
 				expect(slideElement).toHaveAttribute("aria-hidden", "true");
 			}
 		});
+
+		test("go to the next slide until at the first slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const totalSlides = slideElements.length;
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
+				if (slideIdx !== 1) {
+					fireEvent.keyDown(document, {
+						key: "PageUp",
+					});
+
+					jest.advanceTimersByTime(610);
+				}
+
+				if (slideIdx === 1) {
+					fireEvent.keyDown(document, {
+						key: "PageUp",
+					});
+				}
+
+				const nextSlideNumber = slideIdx - 1;
+
+				if (nextSlideNumber >= 0) {
+					expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+				}
+			}
+		});
+
+		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "PageUp",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+		});
 	});
 
 	describe("Home", () => {
@@ -702,6 +934,43 @@ describe("KeyboardNavigation - Integration Test", () => {
 				expect(slideElement).toHaveAttribute("aria-hidden", "true");
 			}
 		});
+
+		test("go to the first slide and the current active slide number changes according to an active slide", () => {
+			new Multiscroll();
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "Home",
+			});
+
+			const firstSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(firstSlideNumber);
+		});
+
+		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+			new Multiscroll();
+
+			store.setState({
+				type: "SLIDING-PROCESS",
+				values: {
+					isSlideNavigating: true,
+				},
+			});
+
+			fireEvent.keyDown(document, {
+				key: "Home",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+		});
 	});
 
 	describe("On mobile size", () => {
@@ -754,6 +1023,55 @@ describe("KeyboardNavigation - Integration Test", () => {
 				expect(slideElement).not.toHaveStyle({ zIndex: 1 });
 				expect(slideElement).not.toHaveAttribute("aria-hidden");
 			}
+
+			// Restore the original window.innerWidth
+			window.innerWidth = originalInnerWidth;
+		});
+
+		test("nothing change to the current active slide number if current viewport is mobile size", () => {
+			const originalInnerWidth = window.innerWidth;
+
+			window.innerWidth = 400;
+
+			new Multiscroll();
+
+			fireEvent.keyDown(document, {
+				key: "ArrowDown",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "ArrowUp",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "PageDown",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "PageUp",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "End",
+			});
+
+			jest.advanceTimersByTime(610);
+
+			fireEvent.keyDown(document, {
+				key: "Home",
+			});
+
+			const defaultActiveSlideNumber = 0;
+
+			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 
 			// Restore the original window.innerWidth
 			window.innerWidth = originalInnerWidth;

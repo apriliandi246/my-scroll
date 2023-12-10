@@ -131,4 +131,56 @@ describe("ButtonNavigation - Integration Test", () => {
 			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
 		}
 	});
+
+	test("navigating until the last nav button and the current active slide number changes according to an active slide", () => {
+		new Multiscroll();
+
+		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
+
+		for (let btnIdx = 1; btnIdx < navBtnElements.length; btnIdx++) {
+			const nextSlideNumber = btnIdx;
+			const nextNavBtnElement = navBtnElements[nextSlideNumber];
+
+			fireEvent.click(nextNavBtnElement);
+
+			expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+		}
+	});
+
+	test("navigating until the first nav button and the current active slide number changes according to an active slide", () => {
+		new Multiscroll();
+
+		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
+		const lastNavBtnElement = navBtnElements[navBtnElements.length - 1];
+
+		fireEvent.click(lastNavBtnElement);
+
+		for (let btnIdx = navBtnElements.length - 2; btnIdx >= 0; btnIdx--) {
+			const nextSlideNumber = btnIdx;
+			const nextNavBtnElement = navBtnElements[nextSlideNumber];
+
+			fireEvent.click(nextNavBtnElement);
+
+			expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
+		}
+	});
+
+	test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		new Multiscroll();
+
+		const nextSlideNumber = 1;
+		const defaultActiveSlideNumber = 0;
+		const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${nextSlideNumber}` });
+
+		store.setState({
+			type: "SLIDING-PROCESS",
+			values: {
+				isSlideNavigating: true,
+			},
+		});
+
+		fireEvent.click(nextNavBtnElement);
+
+		expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+	});
 });
