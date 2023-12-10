@@ -18,7 +18,6 @@ function createStore(mainState, modifier) {
 	}
 
 	let isMutating = false;
-	const subscribersQueue = [];
 
 	function getState() {
 		/*
@@ -46,29 +45,6 @@ function createStore(mainState, modifier) {
 		}
 
 		mainState = nextState;
-
-		if (subscribersQueue.length > 0) {
-			for (let listenerIdx = 0; listenerIdx < subscribersQueue.length; listenerIdx++) {
-				const subscribeListener = subscribersQueue[listenerIdx];
-				subscribeListener();
-			}
-		}
-	}
-
-	function subscribe(subscriber) {
-		if (typeof subscriber !== "function") {
-			throw new Error("Just using plain function for the subscribe listener");
-		}
-
-		subscribersQueue.push(subscriber);
-
-		return function unsubscribe() {
-			const subscribeListenerIndex = subscribersQueue.indexOf(subscriber);
-
-			if (subscribeListenerIndex !== -1 && subscriber === subscribersQueue[subscribeListenerIndex]) {
-				subscribersQueue.splice(subscribeListenerIndex, 1);
-			}
-		};
 	}
 
 	function isJustObject(obj) {
@@ -93,7 +69,6 @@ function createStore(mainState, modifier) {
 	return {
 		setState,
 		getState,
-		subscribe,
 	};
 }
 
