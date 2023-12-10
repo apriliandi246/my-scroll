@@ -7,7 +7,6 @@ import Multiscroll from "../../../dekstop/multiscroll/javascript/Multiscroll.js"
 
 beforeEach(() => {
 	setupHTML();
-	setupCSS();
 	setupStore();
 });
 

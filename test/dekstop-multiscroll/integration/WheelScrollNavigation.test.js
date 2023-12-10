@@ -1,14 +1,12 @@
 import { fireEvent, screen, prettyDOM } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 
-import setupCSS from "../../utils/setupCSS.js";
 import setupHTML from "../../utils/setupHTML.js";
 import setupStore from "../../utils/setupStore.js";
 import store from "../../../dekstop/multiscroll/javascript/store.js";
 import Multiscroll from "../../../dekstop/multiscroll/javascript/Multiscroll.js";
 
 beforeEach(() => {
-	setupCSS();
 	setupHTML();
 	setupStore();
 
