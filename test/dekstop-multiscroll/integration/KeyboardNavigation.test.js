@@ -1,8 +1,8 @@
 import { fireEvent, screen, prettyDOM } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 
-import setupHTML from "../../utils/setupHTML.js";
-import setupStore from "../../utils/setupStore.js";
+import setupHTML from "../../helpers/setupHTML.js";
+import setupStore from "../../helpers/setupStore.js";
 import store from "../../../dekstop/multiscroll/javascript/store.js";
 import Multiscroll from "../../../dekstop/multiscroll/javascript/Multiscroll.js";
 
@@ -59,49 +59,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 	});
 
 	describe("ArrowDown", () => {
-		test("go to the next slide and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide and previous slide become unactive and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const prevSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
-			expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
-
-			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide until at the last slide and the nav buttons and slide changes accordingly", () => {
+		test("navigate until the last slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
@@ -109,12 +67,6 @@ describe("KeyboardNavigation - Integration Test", () => {
 			const totalSlides = slideElements.length;
 
 			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
-				const prevSlideElement = slideElements[slideIdx - 1].parentElement.parentElement;
-				const nextSlideElement = slideElements[slideIdx].parentElement.parentElement;
-
-				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
-				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
-
 				if (slideIdx !== totalSlides - 1) {
 					fireEvent.keyDown(document, {
 						key: "ArrowDown",
@@ -129,14 +81,25 @@ describe("KeyboardNavigation - Integration Test", () => {
 					});
 				}
 
-				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+				const nextSlideNumber = slideIdx;
+				const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+
+				const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+				const prevSlideElement = slideElements[currentActiveSlideNumber - 1].parentElement.parentElement;
+
+				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber - 1}` });
+
 				expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 
 				expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
 				expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
 
 				expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
 				expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
+
+				expect(currentActiveSlideNumber).toBe(nextSlideNumber);
 			}
 		});
 
@@ -185,34 +148,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the next slide until at the last slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
-
-			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
-				if (slideIdx !== totalSlides - 1) {
-					fireEvent.keyDown(document, {
-						key: "ArrowDown",
-					});
-
-					jest.advanceTimersByTime(610);
-				}
-
-				if (slideIdx === totalSlides - 1) {
-					fireEvent.keyDown(document, {
-						key: "ArrowDown",
-					});
-				}
-
-				const nextSlideNumber = slideIdx;
-
-				expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
-			}
-		});
-
-		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -227,55 +163,14 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("PageDown", () => {
-		test("go to the next slide and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide and previous slide become unactive and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const prevSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
-			expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
-
-			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide until at the last slide and the nav buttons and slide changes accordingly", () => {
+		test("navigate until the last slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
@@ -283,15 +178,9 @@ describe("KeyboardNavigation - Integration Test", () => {
 			const totalSlides = slideElements.length;
 
 			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
-				const prevSlideElement = slideElements[slideIdx - 1].parentElement.parentElement;
-				const nextSlideElement = slideElements[slideIdx].parentElement.parentElement;
-
-				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
-				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
-
 				if (slideIdx !== totalSlides - 1) {
 					fireEvent.keyDown(document, {
-						key: "ArrowDown",
+						key: "PageDown",
 					});
 
 					jest.advanceTimersByTime(610);
@@ -299,18 +188,29 @@ describe("KeyboardNavigation - Integration Test", () => {
 
 				if (slideIdx === totalSlides - 1) {
 					fireEvent.keyDown(document, {
-						key: "ArrowDown",
+						key: "PageDown",
 					});
 				}
 
-				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+				const nextSlideNumber = slideIdx;
+				const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+
+				const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+				const prevSlideElement = slideElements[currentActiveSlideNumber - 1].parentElement.parentElement;
+
+				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber - 1}` });
+
 				expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 
 				expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
 				expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
 
 				expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
 				expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
+
+				expect(currentActiveSlideNumber).toBe(nextSlideNumber);
 			}
 		});
 
@@ -359,34 +259,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the next slide until at the last slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
-
-			for (let slideIdx = 1; slideIdx < totalSlides; slideIdx++) {
-				if (slideIdx !== totalSlides - 1) {
-					fireEvent.keyDown(document, {
-						key: "PageDown",
-					});
-
-					jest.advanceTimersByTime(610);
-				}
-
-				if (slideIdx === totalSlides - 1) {
-					fireEvent.keyDown(document, {
-						key: "PageDown",
-					});
-				}
-
-				const nextSlideNumber = slideIdx;
-
-				expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
-			}
-		});
-
-		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -401,22 +274,28 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("End", () => {
-		test("go to the last slide and the nav buttons and slides changes accordingly", () => {
+		test("go to the last slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 			const lastNavBtnElement = screen.getByRole("button", { name: "to slide 11" });
-			const lastSlideElement = screen.getByText(/Slide 11 (Left|Full)/).parentElement.parentElement;
+
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+			const lastSlideNumber = slideElements.length - 1;
+			const lastSlideElement = slideElements[lastSlideNumber].parentElement.parentElement;
 
 			fireEvent.keyDown(document, {
 				key: "End",
 			});
+
+			expect(store.getState().currentActiveSlideNumber).toBe(lastSlideNumber);
 
 			expect(lastNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
@@ -424,7 +303,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			expect(lastSlideElement).toHaveAttribute("aria-hidden", "false");
 		});
 
-		test("should do nothing for nav buttons and slides if user press the End key when at the last slide", () => {
+		test("should do nothing if user press the End key when at the last slide", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
@@ -448,6 +327,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 
 			expect(lastNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
+			expect(store.getState().currentActiveSlideNumber).toBe(totalSlideElements - 1);
+
 			expect(lastSlideElement).toHaveStyle({ zIndex: 1 });
 			expect(lastSlideElement).toHaveAttribute("aria-hidden", "false");
 
@@ -469,20 +350,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the last slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const lastSlideNumber = slideElements.length - 1;
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			expect(store.getState().currentActiveSlideNumber).toBe(lastSlideNumber);
-		});
-
-		test("go to the last slide and the nav buttons and slides changes accordingly", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -497,72 +365,19 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("ArrowUp", () => {
-		test("go to the previous slide and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-
-			const prevSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			expect(prevNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(prevSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(prevSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the previous slide and the next slide become unactive and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const previousSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			expect(nextNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			expect(prevNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(nextSlideElement).not.toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "true");
-
-			expect(previousSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(previousSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide until at the first slide and the nav buttons and slide changes accordingly", () => {
+		test("navigate until the first slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
+			const totalSlideElements = slideElements.length;
 
 			fireEvent.keyDown(document, {
 				key: "End",
@@ -570,8 +385,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 
 			jest.advanceTimersByTime(610);
 
-			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
-				if (slideIdx !== 1) {
+			for (let slideIdx = totalSlideElements - 2; slideIdx >= 0; slideIdx--) {
+				if (slideIdx !== 0) {
 					fireEvent.keyDown(document, {
 						key: "ArrowUp",
 					});
@@ -579,23 +394,31 @@ describe("KeyboardNavigation - Integration Test", () => {
 					jest.advanceTimersByTime(610);
 				}
 
-				if (slideIdx === 1) {
+				if (slideIdx === 0) {
 					fireEvent.keyDown(document, {
 						key: "ArrowUp",
 					});
 				}
 
-				if (slideIdx !== 0) {
-					const slideElement = slideElements[slideIdx - 1].parentElement.parentElement;
-					const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
-					const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
+				const nextSlideNumber = slideIdx;
+				const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-					expect(slideElement).toHaveStyle({ zIndex: 1 });
-					expect(slideElement).toHaveAttribute("aria-hidden", "false");
+				const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+				const prevSlideElement = slideElements[currentActiveSlideNumber + 1].parentElement.parentElement;
 
-					expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-					expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-				}
+				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber + 1}` });
+
+				expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+
+				expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
+				expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
+
+				expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
+				expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
+
+				expect(currentActiveSlideNumber).toBe(nextSlideNumber);
 			}
 		});
 
@@ -633,42 +456,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the next slide until at the first slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
-				if (slideIdx !== 1) {
-					fireEvent.keyDown(document, {
-						key: "ArrowUp",
-					});
-
-					jest.advanceTimersByTime(610);
-				}
-
-				if (slideIdx === 1) {
-					fireEvent.keyDown(document, {
-						key: "ArrowUp",
-					});
-				}
-
-				const nextSlideNumber = slideIdx - 1;
-
-				if (nextSlideNumber >= 0) {
-					expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
-				}
-			}
-		});
-
-		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -683,72 +471,19 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("PageUp", () => {
-		test("go to the previous slide and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-
-			const prevSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			expect(prevNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(prevSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(prevSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the previous slide and the next slide become unactive and the nav button and slide changes accordingly", () => {
-			new Multiscroll();
-
-			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-			const prevNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
-			const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-			const previousSlideElement = screen.getByText(/Slide 0 (Left|Full)/).parentElement.parentElement;
-			const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			expect(nextNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			expect(prevNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			expect(nextSlideElement).not.toHaveStyle({ zIndex: 1 });
-			expect(nextSlideElement).toHaveAttribute("aria-hidden", "true");
-
-			expect(previousSlideElement).toHaveStyle({ zIndex: 1 });
-			expect(previousSlideElement).toHaveAttribute("aria-hidden", "false");
-		});
-
-		test("go to the next slide until at the first slide and the nav buttons and slide changes accordingly", () => {
+		test("navigate until the first slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
+			const totalSlideElements = slideElements.length;
 
 			fireEvent.keyDown(document, {
 				key: "End",
@@ -756,8 +491,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 
 			jest.advanceTimersByTime(610);
 
-			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
-				if (slideIdx !== 1) {
+			for (let slideIdx = totalSlideElements - 2; slideIdx >= 0; slideIdx--) {
+				if (slideIdx !== 0) {
 					fireEvent.keyDown(document, {
 						key: "ArrowUp",
 					});
@@ -765,23 +500,31 @@ describe("KeyboardNavigation - Integration Test", () => {
 					jest.advanceTimersByTime(610);
 				}
 
-				if (slideIdx === 1) {
+				if (slideIdx === 0) {
 					fireEvent.keyDown(document, {
 						key: "ArrowUp",
 					});
 				}
 
-				if (slideIdx !== 0) {
-					const slideElement = slideElements[slideIdx - 1].parentElement.parentElement;
-					const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
-					const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
+				const nextSlideNumber = slideIdx;
+				const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-					expect(slideElement).toHaveStyle({ zIndex: 1 });
-					expect(slideElement).toHaveAttribute("aria-hidden", "false");
+				const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+				const prevSlideElement = slideElements[currentActiveSlideNumber + 1].parentElement.parentElement;
 
-					expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-					expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-				}
+				const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+				const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber + 1}` });
+
+				expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
+				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
+
+				expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
+				expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
+
+				expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
+				expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
+
+				expect(currentActiveSlideNumber).toBe(nextSlideNumber);
 			}
 		});
 
@@ -819,42 +562,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the next slide until at the first slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-			const totalSlides = slideElements.length;
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			for (let slideIdx = totalSlides - 1; slideIdx >= 0; slideIdx--) {
-				if (slideIdx !== 1) {
-					fireEvent.keyDown(document, {
-						key: "PageUp",
-					});
-
-					jest.advanceTimersByTime(610);
-				}
-
-				if (slideIdx === 1) {
-					fireEvent.keyDown(document, {
-						key: "PageUp",
-					});
-				}
-
-				const nextSlideNumber = slideIdx - 1;
-
-				if (nextSlideNumber >= 0) {
-					expect(store.getState().currentActiveSlideNumber).toBe(nextSlideNumber);
-				}
-			}
-		});
-
-		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -869,14 +577,17 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("Home", () => {
-		test("go to the first slide and the nav buttons and slides changes accordingly", () => {
+		test("go to the first slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 			new Multiscroll();
+
+			const firstSlideNumber = 0;
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 			const firstNavBtnElement = screen.getByRole("button", { name: "to slide 0" });
@@ -892,6 +603,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 				key: "Home",
 			});
 
+			expect(store.getState().currentActiveSlideNumber).toBe(firstSlideNumber);
+
 			expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
 			expect(firstSlideElement).toHaveStyle({ zIndex: 1 });
@@ -900,6 +613,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 
 		test("should do nothing if user press the Home key when at the first slide", () => {
 			new Multiscroll();
+
+			const firstSlideNumber = 0;
 
 			const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 			const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
@@ -913,6 +628,8 @@ describe("KeyboardNavigation - Integration Test", () => {
 			fireEvent.keyDown(document, {
 				key: "Home",
 			});
+
+			expect(store.getState().currentActiveSlideNumber).toBe(firstSlideNumber);
 
 			expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
@@ -935,25 +652,7 @@ describe("KeyboardNavigation - Integration Test", () => {
 			}
 		});
 
-		test("go to the first slide and the current active slide number changes according to an active slide", () => {
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "Home",
-			});
-
-			const firstSlideNumber = 0;
-
-			expect(store.getState().currentActiveSlideNumber).toBe(firstSlideNumber);
-		});
-
-		test("nothing change to the current active slide number if other navigating process is not done yet", () => {
+		test("should do nothing if other navigating process is not done yet", () => {
 			new Multiscroll();
 
 			store.setState({
@@ -968,67 +667,14 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 		});
 	});
 
 	describe("On mobile size", () => {
-		test("should do nothing for slides if the current viewport is mobile size", () => {
-			const originalInnerWidth = window.innerWidth;
-
-			window.innerWidth = 400;
-
-			new Multiscroll();
-
-			fireEvent.keyDown(document, {
-				key: "ArrowDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "ArrowUp",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "PageDown",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "PageUp",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "End",
-			});
-
-			jest.advanceTimersByTime(610);
-
-			fireEvent.keyDown(document, {
-				key: "Home",
-			});
-
-			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-
-			for (let slideIdx = 0; slideIdx < slideElements.length; slideIdx++) {
-				const slideElement = slideElements[slideIdx].parentElement.parentElement;
-
-				expect(slideElement).not.toHaveStyle({ zIndex: 1 });
-				expect(slideElement).not.toHaveAttribute("aria-hidden");
-			}
-
-			// Restore the original window.innerWidth
-			window.innerWidth = originalInnerWidth;
-		});
-
-		test("nothing change to the current active slide number if current viewport is mobile size", () => {
+		test("should do nothing if the current viewport is mobile size", () => {
 			const originalInnerWidth = window.innerWidth;
 
 			window.innerWidth = 400;
@@ -1070,8 +716,18 @@ describe("KeyboardNavigation - Integration Test", () => {
 			});
 
 			const defaultActiveSlideNumber = 0;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+			const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+
+			expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+
+			for (let slideIdx = 0; slideIdx < slideElements.length; slideIdx++) {
+				const slideElement = slideElements[slideIdx].parentElement.parentElement;
+
+				expect(slideElement).not.toHaveStyle({ zIndex: 1 });
+				expect(slideElement).not.toHaveAttribute("aria-hidden");
+			}
 
 			// Restore the original window.innerWidth
 			window.innerWidth = originalInnerWidth;

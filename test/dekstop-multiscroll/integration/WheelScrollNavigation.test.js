@@ -1,8 +1,8 @@
 import { fireEvent, screen, prettyDOM } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 
-import setupHTML from "../../utils/setupHTML.js";
-import setupStore from "../../utils/setupStore.js";
+import setupHTML from "../../helpers/setupHTML.js";
+import setupStore from "../../helpers/setupStore.js";
 import store from "../../../dekstop/multiscroll/javascript/store.js";
 import Multiscroll from "../../../dekstop/multiscroll/javascript/Multiscroll.js";
 
@@ -18,25 +18,7 @@ afterEach(() => {
 });
 
 describe("WheelScrollNavigation - Integration Testing", () => {
-	test("go to the next slide and the nav button and slide changes accordingly", () => {
-		new Multiscroll();
-
-		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-		const nextNavBtnElement = screen.getByRole("button", { name: "to slide 1" });
-
-		const nextSlideElement = screen.getByText(/Slide 1 (Left|Full)/).parentElement.parentElement;
-
-		fireEvent.wheel(document, {
-			deltaY: 60,
-		});
-
-		expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-		expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
-		expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
-	});
-
-	test("wheel until the last slide and nav buttons and slides changes accordingly", () => {
+	test("wheel until the last slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 		new Multiscroll();
 
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
@@ -44,18 +26,12 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		const totalSlideElements = slideElements.length;
 
 		for (let slideIdx = 1; slideIdx < totalSlideElements; slideIdx++) {
-			const prevSlideElement = slideElements[slideIdx - 1].parentElement.parentElement;
-			const nextSlideElement = slideElements[slideIdx].parentElement.parentElement;
-
-			const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
-			const nextButtonElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
-
 			if (slideIdx !== totalSlideElements - 1) {
 				fireEvent.wheel(document, {
 					deltaY: 60,
 				});
 
-				jest.advanceTimersByTime(610);
+				jest.advanceTimersByTime(1000);
 			}
 
 			if (slideIdx === totalSlideElements - 1) {
@@ -64,7 +40,18 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 				});
 			}
 
-			expect(nextButtonElement).toHaveClass(ACTIVE_CLASSNAME);
+			const nextSlideNumber = slideIdx;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+
+			const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+			const prevSlideElement = slideElements[currentActiveSlideNumber - 1].parentElement.parentElement;
+
+			const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+			const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber - 1}` });
+
+			expect(currentActiveSlideNumber).toBe(nextSlideNumber);
+
+			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 			expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 
 			expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
@@ -75,60 +62,60 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		}
 	});
 
-	test("wheel until the last slide and come back until at the first slide and nav buttons and slides changes accordingly", () => {
+	test("wheel until the first slide and nav buttons, slides and the current active slide number changes accordingly", () => {
 		new Multiscroll();
-
-		let prevNavBtnElement;
 
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
 		const totalSlideElements = slideElements.length;
 
-		for (let slideIdx = 1; slideIdx < totalSlideElements; slideIdx++) {
-			const slideElement = slideElements[slideIdx].parentElement.parentElement;
+		fireEvent.keyDown(document, {
+			key: "End",
+		});
 
-			fireEvent.wheel(document, {
-				deltaY: 60,
-			});
-
-			jest.advanceTimersByTime(610);
-
-			expect(slideElement).toHaveStyle({ zIndex: 1 });
-			expect(slideElement).toHaveAttribute("aria-hidden", "false");
-		}
+		jest.advanceTimersByTime(610);
 
 		for (let slideIdx = totalSlideElements - 2; slideIdx >= 0; slideIdx--) {
-			const prevSlideElement = slideElements[slideIdx + 1].parentElement.parentElement;
-			const nextSlideElement = slideElements[slideIdx].parentElement.parentElement;
-
 			if (slideIdx !== 0) {
-				prevNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx - 1}` });
+				fireEvent.wheel(document, {
+					deltaY: -60,
+				});
+
+				jest.advanceTimersByTime(610);
 			}
 
-			const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${slideIdx}` });
+			if (slideIdx === 0) {
+				fireEvent.wheel(document, {
+					deltaY: -60,
+				});
+			}
 
-			fireEvent.wheel(document, {
-				deltaY: -60,
-			});
+			const nextSlideNumber = slideIdx;
+			const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
 
-			jest.advanceTimersByTime(610);
+			const nextSlideElement = slideElements[currentActiveSlideNumber].parentElement.parentElement;
+			const prevSlideElement = slideElements[currentActiveSlideNumber + 1].parentElement.parentElement;
+
+			const nextNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber}` });
+			const prevNavBtnElement = screen.getByRole("button", { name: `to slide ${currentActiveSlideNumber + 1}` });
 
 			expect(nextNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
-
-			if (slideIdx !== 0) {
-				expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
-			}
+			expect(prevNavBtnElement).not.toHaveClass(ACTIVE_CLASSNAME);
 
 			expect(prevSlideElement).not.toHaveStyle({ zIndex: 1 });
 			expect(prevSlideElement).toHaveAttribute("aria-hidden", "true");
 
 			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
 			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
+
+			expect(currentActiveSlideNumber).toBe(nextSlideNumber);
 		}
 	});
 
 	test("should do nothing if the deltaY value is not face the minimum of the value", () => {
 		new Multiscroll();
+
+		const defaultActiveSlideNumber = 0;
 
 		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
 		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
@@ -141,6 +128,8 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		fireEvent.wheel(document, {
 			deltaY: 10,
 		});
+
+		expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 
 		expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
@@ -164,14 +153,6 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 	test("should do nothing if other navigating process is not done yet", () => {
 		new Multiscroll();
 
-		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
-		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
-		const totalNavBtnElements = navBtnElements.length;
-		const firstNavBtnElement = navBtnElements[0];
-
-		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
-		const firstSlideElement = slideElements[0].parentElement.parentElement;
-
 		store.setState({
 			type: "SLIDING-PROCESS",
 			values: {
@@ -182,6 +163,18 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 		fireEvent.wheel(document, {
 			deltaY: 60,
 		});
+
+		const defaultActiveSlideNumber = 0;
+
+		const ACTIVE_CLASSNAME = "mys-multiscroll-nav__btn--active";
+		const navBtnElements = screen.getAllByRole("button", { name: /to slide \d+/ });
+		const totalNavBtnElements = navBtnElements.length;
+		const firstNavBtnElement = navBtnElements[0];
+
+		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+		const firstSlideElement = slideElements[0].parentElement.parentElement;
+
+		expect(store.getState().currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
 
 		expect(firstNavBtnElement).toHaveClass(ACTIVE_CLASSNAME);
 
@@ -200,5 +193,64 @@ describe("WheelScrollNavigation - Integration Testing", () => {
 			expect(slideElement).not.toHaveStyle({ zIndex: 1 });
 			expect(slideElement).toHaveAttribute("aria-hidden", "true");
 		}
+	});
+
+	test("should do nothing the current viewport is mobile size", () => {
+		const originalInnerWidth = window.innerWidth;
+
+		window.innerWidth = 400;
+
+		new Multiscroll();
+
+		fireEvent.wheel(document, {
+			deltaY: 60,
+		});
+
+		jest.advanceTimersByTime(610);
+
+		fireEvent.wheel(document, {
+			deltaY: -60,
+		});
+
+		jest.advanceTimersByTime(610);
+
+		fireEvent.wheel(document, {
+			deltaY: 60,
+		});
+
+		jest.advanceTimersByTime(610);
+
+		fireEvent.wheel(document, {
+			deltaY: 60,
+		});
+
+		jest.advanceTimersByTime(610);
+
+		fireEvent.wheel(document, {
+			deltaY: 60,
+		});
+
+		jest.advanceTimersByTime(610);
+
+		fireEvent.wheel(document, {
+			deltaY: -60,
+		});
+
+		const defaultActiveSlideNumber = 0;
+		const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+
+		const slideElements = screen.getAllByText(/Slide \d+ (Left|Full)/);
+
+		expect(currentActiveSlideNumber).toBe(defaultActiveSlideNumber);
+
+		for (let slideIdx = 0; slideIdx < slideElements.length; slideIdx++) {
+			const slideElement = slideElements[slideIdx].parentElement.parentElement;
+
+			expect(slideElement).not.toHaveStyle({ zIndex: 1 });
+			expect(slideElement).not.toHaveAttribute("aria-hidden");
+		}
+
+		// Restore the original window.innerWidth
+		window.innerWidth = originalInnerWidth;
 	});
 });
