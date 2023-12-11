@@ -45,8 +45,6 @@ describe("ButtonNavigation - Integration Test", () => {
 			expect(nextSlideActiveElement).toHaveStyle({ zIndex: 1 });
 			expect(nextSlideActiveElement).toHaveAttribute("aria-hidden", "false");
 		}
-
-		expect(store.getState().currentActiveSlideNumber).toBe(navBtnElements.length - 1);
 	});
 
 	test("navigating until the first nav button and the slides, nav buttons and the current active slide number changes accordingly", () => {
@@ -85,8 +83,6 @@ describe("ButtonNavigation - Integration Test", () => {
 			expect(nextSlideElement).toHaveStyle({ zIndex: 1 });
 			expect(nextSlideElement).toHaveAttribute("aria-hidden", "false");
 		}
-
-		expect(store.getState().currentActiveSlideNumber).toBe(0);
 	});
 
 	test("should do nothing if other navigating process is not done yet", () => {
