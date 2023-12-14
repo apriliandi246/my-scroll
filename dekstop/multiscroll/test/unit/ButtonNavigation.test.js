@@ -1,9 +1,9 @@
 import { fireEvent, screen } from "@testing-library/dom";
 import "@testing-library/jest-dom";
 
-import setupHTML from "../../helpers/setupHTML.js";
-import setupStore from "../../helpers/setupStore.js";
-import Multiscroll from "../../../dekstop/multiscroll/javascript/Multiscroll.js";
+import setupHTML from "../helpers/setupHTML.js";
+import setupStore from "../helpers/setupStore.js";
+import Multiscroll from "../../packages/javascript/Multiscroll.js";
 
 beforeEach(() => {
 	setupHTML();

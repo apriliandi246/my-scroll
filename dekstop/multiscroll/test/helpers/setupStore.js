@@ -1,4 +1,4 @@
-import store from "../../dekstop/multiscroll/javascript/store";
+import store from "../../packages/javascript/store.js";
 
 function setupStore() {
 	store.setState({
