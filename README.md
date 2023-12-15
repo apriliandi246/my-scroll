@@ -6,7 +6,8 @@
 
 Multiscroll (dekstop) and Swipe (mobile) functionalities....
 
-Multiscroll dekstop demo: [Here](https://multi-scroll-dekstop.netlify.app/)
+Multiscroll dekstop simple demo: [Here](https://multi-scroll-dekstop.netlify.app)
+Multiscroll dekstop landing page: [Here](https://multiscroll-landing-page.netlify.app)
 
 Swipe mobile demo: (on progress)
 
