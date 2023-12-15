@@ -1,0 +1,35 @@
+.mys-multiscroll-nav {
+	top: 0;
+	right: 0;
+	gap: 14px;
+	z-index: 2;
+	height: 100%;
+	display: flex;
+	position: fixed;
+	margin-right: 35px;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.mys-multiscroll-nav__btn {
+	width: 10px;
+	height: 10px;
+	cursor: pointer;
+	border-radius: 100%;
+	background-color: #fff;
+	border: 2px solid #c4c4c4;
+	transition: background-color var(--mys-multiscroll-nav-btn-transition-duration), transform var(--mys-multiscroll-nav-btn-transition-duration);
+}
+
+.mys-multiscroll-nav__btn--active {
+	transform: scale(1.5);
+	background-color: #c4c4c4;
+}
+
+@media screen and (max-width: 992px) {
+	.mys-multiscroll-nav {
+		display: none;
+	}
+}

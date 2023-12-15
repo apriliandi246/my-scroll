@@ -1,1 +1,670 @@
-"use strict";function createStore(t,e){if(!1===s(t))throw new Error("Just using plain object for the main state");if(!0==(i=t,0===Object.keys(i).length))throw new Error("Where the hell is your properties of state in your main state object");var i;if("function"!=typeof e)throw new Error("Just using plain function for the state modifier");function s(t){if("object"!=typeof t)return!1;const e=Object.getPrototypeOf(t);return null!==e&&null===Object.getPrototypeOf(e)}return{setState:function(i){if(!1===s(i))throw new Error("Just using plain object for the payload");const n=e({...t},i);if(!1===s(n))throw new Error("Where is the return of object state from your state modifier?");t=n},getState:function(){return Object.freeze(t)}}}const mainState={isSlideNavigating:!1,currentActiveSlideNumber:0};function stateModifier(t,e){const{type:i,values:s}=e;return"SLIDING-PROCESS"===i&&(t.isSlideNavigating=s.isSlideNavigating),"ACTIVE-SLIDE"===i&&(t.currentActiveSlideNumber=s.currentActiveSlideNumber),t}const store=createStore(mainState,stateModifier);class ButtonNavigation{#t;#e;#i;#s;#n;constructor(t){this.#t=t,this.#s="data-mys-multiscroll-nav",this.#n="mys-multiscroll-nav__btn--active",this.#e=document.getElementsByClassName("mys-multiscroll-nav__btn"),this.#i=this.#e.length,this.#r()}#r(){this.#l()}#l(){if(0!==this.#e.length)for(let t=0;t<this.#i;t++){const e=this.#e[t];e.addEventListener("click",(()=>{if(!1===this.#t.isDekstopView())return;const{isSlideNavigating:i,currentActiveSlideNumber:s}=store.getState();if(s===t)return;if(!0===i)return;const n=e.getAttribute(this.#s),r=parseInt(n),l=Math.abs(s-r);this.setUnActivePrevBtnNav(),1===l&&(s-1===r&&this.#t.oneTimeSlidingSlide("top"),s+1===r&&this.#t.oneTimeSlidingSlide("bottom")),l>1&&(0!==s&&r<s&&this.#t.multipleTimeSlidingSlide("top",l,r),s!==this.#t.totalSlideElements-1&&r>store.getState().currentActiveSlideNumber&&this.#t.multipleTimeSlidingSlide("bottom",l,r)),this.setActiveNextBtnNav()}))}}setActiveNextBtnNav(){if(0===this.#e.length)return;const t=store.getState().currentActiveSlideNumber;this.#e[t].classList.add(this.#n)}setUnActivePrevBtnNav(){if(0===this.#e.length)return;const t=store.getState().currentActiveSlideNumber;this.#e[t].classList.remove(this.#n)}}class KeyboardNavigation{#t;#a;constructor(t,e){this.#t=t,this.#a=e,this.#r()}#r(){this.#o()}#o(){document.addEventListener("keydown",this.#d((t=>{if(!1===this.#t.isDekstopView())return;const{isSlideNavigating:e,currentActiveSlideNumber:i}=store.getState();if(!0===e)return;const s=t.key,n=this.#t.totalSlideElements-1;if("ArrowUp"!==s&&"PageUp"!==s||0!==i&&(this.#a.setUnActivePrevBtnNav(),this.#t.oneTimeSlidingSlide("top"),this.#a.setActiveNextBtnNav()),"ArrowDown"!==s&&"PageDown"!==s||i!==n&&(this.#a.setUnActivePrevBtnNav(),this.#t.oneTimeSlidingSlide("bottom"),this.#a.setActiveNextBtnNav()),"Home"===s&&0!==i){const t=Math.abs(i);this.#a.setUnActivePrevBtnNav(),this.#t.multipleTimeSlidingSlide("top",t,0),this.#a.setActiveNextBtnNav()}if("End"===s&&i!==n){const t=Math.abs(i-n);this.#a.setUnActivePrevBtnNav(),this.#t.multipleTimeSlidingSlide("bottom",t,this.#t.totalSlideElements-1),this.#a.setActiveNextBtnNav()}}),this.#t.slideTransitionDuration))}#d(t,e){let i=!0;return function(...s){!0===i&&(t.apply(this,s),i=!1,setTimeout((()=>{i=!0}),e))}}}class WheelScrollNavigation{#t;#a;constructor(t,e){this.#t=t,this.#a=e,this.#r()}#r(){this.#u()}#u(){let t=0,e=0,i=!1,s=null;document.addEventListener("wheel",(n=>{if(!1===this.#t.isDekstopView())return;const{isSlideNavigating:r,currentActiveSlideNumber:l}=store.getState();if(!0===r)return;const a=-1*n.deltaY,o=Math.abs(a),d=n.timeStamp;function u(){t=50,i=!1}o<20||d-e<300&&!0===i||(e=d,t<o&&!1===i&&(a>50&&0!==l&&(this.#a.setUnActivePrevBtnNav(),this.#t.oneTimeSlidingSlide("top"),this.#a.setActiveNextBtnNav()),a<-50&&l!==this.#t.totalSlideElements-1&&(this.#a.setUnActivePrevBtnNav(),this.#t.oneTimeSlidingSlide("bottom"),this.#a.setActiveNextBtnNav()),function(e){t=e,i=!0}(o),clearTimeout(s),s=setTimeout((()=>{t===o&&u()}),this.#t.slideTransitionDuration)),o<50&&!0===i&&u())}),{passive:!0})}}class Slide{#c;#m;#v;#h;#S;constructor(){this.slideTransitionDuration,this.#h=768,this.#v="data-mys-multiscroll-slide-type",this.#S="--mys-multiscroll-slide-transition-duration",this.#m=document.getElementById("mys-multiscroll-slide-container"),this.#c=this.#m.children,this.totalSlideElements=this.#c.length,this.#r()}#r(){this.#N(),this.#g(),this.#b()}#N(){const t=getComputedStyle(this.#m).getPropertyValue(this.#S),e=parseInt(t);this.slideTransitionDuration=e}#b(){if(!0===this.isDekstopView())return;const{currentActiveSlideNumber:t}=store.getState();this.#c[t].style.removeProperty("z-index");for(let t=0;t<this.totalSlideElements;t++){this.#c[t].removeAttribute("aria-hidden")}}#g(){window.addEventListener("resize",this.#f((()=>{const{currentActiveSlideNumber:t}=store.getState(),e=this.#c[t];if(!0===this.isDekstopView()){e.style.setProperty("z-index","1");for(let e=0;e<this.totalSlideElements;e++){const i=this.#c[e];t===e&&i.setAttribute("aria-hidden","false"),t!==e&&i.setAttribute("aria-hidden","true")}}if(!1===this.isDekstopView()){e.style.removeProperty("z-index");for(let t=0;t<this.totalSlideElements;t++){this.#c[t].removeAttribute("aria-hidden")}}}),300))}#f(t,e){let i;return function(...s){clearTimeout(i),i=setTimeout((()=>{t.apply(this,s)}),e)}}oneTimeSlidingSlide(t){const{getState:e,setState:i}=store;i({type:"SLIDING-PROCESS",values:{isSlideNavigating:!0}});for(let e=0;e<this.totalSlideElements;e++){const i=this.#c[e],s=i.getAttribute(this.#v),n=i.firstElementChild,r=n.style.getPropertyValue("transform"),l=parseInt(r.replace(/[^-\d.]/g,""));if("full"===s){if("top"===t){const t=l+100;n.style.setProperty("transform",`translateY(${t}%)`)}if("bottom"===t){const t=l-100;n.style.setProperty("transform",`translateY(${t}%)`)}}if("multi"===s){const e=i.lastElementChild,s=e.style.getPropertyValue("transform"),r=parseInt(s.replace(/[^-\d.]/g,""));if("top"===t){const t=l+100,i=r-100;n.style.setProperty("transform",`translateY(${t}%)`),e.style.setProperty("transform",`translateY(${i}%)`)}if("bottom"===t){const t=l-100,i=r+100;n.style.setProperty("transform",`translateY(${t}%)`),e.style.setProperty("transform",`translateY(${i}%)`)}}}if(this.#c[e().currentActiveSlideNumber].style.removeProperty("z-index"),this.#c[e().currentActiveSlideNumber].setAttribute("aria-hidden","true"),"top"===t){this.#c[e().currentActiveSlideNumber].previousElementSibling.setAttribute("aria-hidden","false"),i({type:"ACTIVE-SLIDE",values:{currentActiveSlideNumber:e().currentActiveSlideNumber-1}})}if("bottom"===t){this.#c[e().currentActiveSlideNumber].nextElementSibling.setAttribute("aria-hidden","false"),i({type:"ACTIVE-SLIDE",values:{currentActiveSlideNumber:e().currentActiveSlideNumber+1}})}this.#c[e().currentActiveSlideNumber].style.setProperty("z-index","1"),i({type:"SLIDING-PROCESS",values:{isSlideNavigating:!1}})}multipleTimeSlidingSlide(t,e,i){const{getState:s,setState:n}=store;n({type:"SLIDING-PROCESS",values:{isSlideNavigating:!0}}),this.#c[s().currentActiveSlideNumber].style.removeProperty("z-index");for(let r=0;r<e;r++)for(let e=0;e<this.totalSlideElements;e++){const r=this.#c[e],l=r.getAttribute(this.#v),a=r.firstElementChild,o=a.style.getPropertyValue("transform"),d=parseInt(o.replace(/[^-\d.]/g,""));if("full"===l){if("top"===t){const t=d+100;a.style.setProperty("transform",`translateY(${t}%)`)}if("bottom"===t){const t=d-100;a.style.setProperty("transform",`translateY(${t}%)`)}}if("multi"===l){const e=r.lastElementChild,i=e.style.getPropertyValue("transform"),s=parseInt(i.replace(/[^-\d.]/g,""));if("top"===t){const t=d+100,i=s-100;a.style.setProperty("transform",`translateY(${t}%)`),e.style.setProperty("transform",`translateY(${i}%)`)}if("bottom"===t){const t=d-100,i=s+100;a.style.setProperty("transform",`translateY(${t}%)`),e.style.setProperty("transform",`translateY(${i}%)`)}}s().currentActiveSlideNumber!==i&&(this.#c[i].setAttribute("aria-hidden","false"),this.#c[s().currentActiveSlideNumber].setAttribute("aria-hidden","true")),n({type:"ACTIVE-SLIDE",values:{currentActiveSlideNumber:i}}),this.#c[s().currentActiveSlideNumber].style.setProperty("z-index","1"),n({type:"SLIDING-PROCESS",values:{isSlideNavigating:!1}})}}isDekstopView(){return window.innerWidth>this.#h}}class Mulstiscroll{constructor(){this.#p()}#p(){const t=new Slide,e=new ButtonNavigation(t);new KeyboardNavigation(t,e),new WheelScrollNavigation(t,e)}}new Mulstiscroll;
+"use strict";
+
+function createStore(mainState, modifier) {
+	if (isJustObject(mainState) === false) {
+		throw new Error("Just using plain object for the main state");
+	}
+
+	if (isObjectEmpty(mainState) === true) {
+		throw new Error("Where the hell is your properties of state in your main state object");
+	}
+
+	if (typeof modifier !== "function") {
+		throw new Error("Just using plain function for the state modifier");
+	}
+
+	let isMutating = false;
+
+	function getState() {
+		/*
+			🕵️‍♂️
+		*/
+		if (isMutating === true) return;
+
+		return Object.freeze(mainState);
+	}
+
+	function setState(payload) {
+		/*
+			🕵️‍♂️
+		*/
+		if (isMutating === true) return;
+
+		if (isJustObject(payload) === false) {
+			throw new Error("Just using plain object for the payload");
+		}
+
+		const nextState = modifier({ ...mainState }, payload);
+
+		if (isJustObject(nextState) === false) {
+			throw new Error("Where is the return of object state from your state modifier?");
+		}
+
+		mainState = nextState;
+	}
+
+	function isJustObject(obj) {
+		if (typeof obj !== "object") return false;
+
+		const proto = Object.getPrototypeOf(obj);
+		const isPlainObject = proto !== null && Object.getPrototypeOf(proto) === null;
+
+		return isPlainObject;
+	}
+
+	function isObjectEmpty(obj) {
+		const objProperties = Object.keys(obj);
+
+		if (objProperties.length === 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	return {
+		setState,
+		getState,
+	};
+}
+
+const mainState = {
+	isSlideNavigating: false,
+	currentActiveSlideNumber: 0,
+};
+
+function stateModifier(state, payload) {
+	const { type, values } = payload;
+
+	if (type === "SLIDING-PROCESS") {
+		state.isSlideNavigating = values.isSlideNavigating;
+	}
+
+	if (type === "ACTIVE-SLIDE") {
+		state.currentActiveSlideNumber = values.currentActiveSlideNumber;
+	}
+
+	return state;
+}
+
+const store = createStore(mainState, stateModifier);
+
+class Slide {
+	#slideElements;
+	#slidesContainer;
+	#slideTypeDataAttr;
+	#CSSPixelMobileSize;
+	#transitionDelayCSSVariable;
+
+	constructor() {
+		this.slideTransitionDuration;
+		this.#CSSPixelMobileSize = 768;
+
+		this.#slideTypeDataAttr = "data-mys-multiscroll-slide-type";
+		this.#transitionDelayCSSVariable = "--mys-multiscroll-slide-transition-duration";
+		this.#slidesContainer = document.getElementById("mys-multiscroll-slide-container");
+
+		this.#slideElements = this.#slidesContainer.children;
+		this.totalSlideElements = this.#slideElements.length;
+
+		this.#run();
+	}
+
+	#run() {
+		this.#setSlideTransitionDuration();
+		this.#setSlidesAttributesWhileResizing();
+		this.#setSlidesAttributesOnMobileView();
+	}
+
+	#setSlideTransitionDuration() {
+		const computedStyle = getComputedStyle(this.#slidesContainer);
+		const transitionSlideTimeCSSValue = computedStyle.getPropertyValue(this.#transitionDelayCSSVariable);
+		const transitionSlideTimeInt = parseInt(transitionSlideTimeCSSValue);
+
+		this.slideTransitionDuration = transitionSlideTimeInt;
+	}
+
+	#setSlidesAttributesOnMobileView() {
+		if (this.isDekstopView() === true) return;
+
+		const { currentActiveSlideNumber } = store.getState();
+
+		const currentActiveSlideElement = this.#slideElements[currentActiveSlideNumber];
+		currentActiveSlideElement.style.removeProperty("z-index");
+
+		for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
+			const slideElement = this.#slideElements[slideIdx];
+			slideElement.removeAttribute("aria-hidden");
+		}
+	}
+
+	#setSlidesAttributesWhileResizing() {
+		const resizeEventHandler = () => {
+			const { currentActiveSlideNumber } = store.getState();
+			const currentActiveSlideElement = this.#slideElements[currentActiveSlideNumber];
+
+			if (this.isDekstopView() === true) {
+				currentActiveSlideElement.style.setProperty("z-index", "1");
+
+				for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
+					const slideElement = this.#slideElements[slideIdx];
+
+					if (currentActiveSlideNumber === slideIdx) {
+						slideElement.setAttribute("aria-hidden", "false");
+					}
+
+					if (currentActiveSlideNumber !== slideIdx) {
+						slideElement.setAttribute("aria-hidden", "true");
+					}
+				}
+			}
+
+			if (this.isDekstopView() === false) {
+				currentActiveSlideElement.style.removeProperty("z-index");
+
+				for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
+					const slideElement = this.#slideElements[slideIdx];
+					slideElement.removeAttribute("aria-hidden");
+				}
+			}
+		};
+
+		window.addEventListener("resize", this.#debounce(resizeEventHandler, 300));
+	}
+
+	#debounce(func, delay) {
+		let timer;
+
+		return function (...args) {
+			clearTimeout(timer);
+
+			timer = setTimeout(() => {
+				func.apply(this, args);
+			}, delay);
+		};
+	}
+
+	oneTimeSlidingSlide(direction) {
+		const { getState, setState } = store;
+
+		setState({
+			type: "SLIDING-PROCESS",
+			values: {
+				isSlideNavigating: true,
+			},
+		});
+
+		for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
+			const slideElement = this.#slideElements[slideIdx];
+			const slideElementType = slideElement.getAttribute(this.#slideTypeDataAttr);
+
+			const firstSlideElement = slideElement.firstElementChild;
+			const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
+			const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+			if (slideElementType === "full") {
+				if (direction === "top") {
+					const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+				}
+
+				if (direction === "bottom") {
+					const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+				}
+			}
+
+			if (slideElementType === "multi") {
+				const secondSlideElement = slideElement.lastElementChild;
+				const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
+				const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+				if (direction === "top") {
+					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+				}
+
+				if (direction === "bottom") {
+					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
+
+					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+				}
+			}
+		}
+
+		this.#slideElements[getState().currentActiveSlideNumber].style.removeProperty("z-index");
+		this.#slideElements[getState().currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+
+		if (direction === "top") {
+			const previosSlideElement = this.#slideElements[getState().currentActiveSlideNumber].previousElementSibling;
+			previosSlideElement.setAttribute("aria-hidden", "false");
+
+			setState({
+				type: "ACTIVE-SLIDE",
+				values: {
+					currentActiveSlideNumber: getState().currentActiveSlideNumber - 1,
+				},
+			});
+		}
+
+		if (direction === "bottom") {
+			const nextSlideElement = this.#slideElements[getState().currentActiveSlideNumber].nextElementSibling;
+			nextSlideElement.setAttribute("aria-hidden", "false");
+
+			setState({
+				type: "ACTIVE-SLIDE",
+				values: {
+					currentActiveSlideNumber: getState().currentActiveSlideNumber + 1,
+				},
+			});
+		}
+
+		/*
+			🕵️‍♂️
+		*/
+		this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+
+		setState({
+			type: "SLIDING-PROCESS",
+			values: {
+				isSlideNavigating: false,
+			},
+		});
+	}
+
+	multipleTimeSlidingSlide(direction, slideComparison, choosenSlideNumber) {
+		const { getState, setState } = store;
+
+		setState({
+			type: "SLIDING-PROCESS",
+			values: {
+				isSlideNavigating: true,
+			},
+		});
+
+		this.#slideElements[getState().currentActiveSlideNumber].style.removeProperty("z-index");
+
+		for (let ii = 0; ii < slideComparison; ii++) {
+			for (let slideIdx = 0; slideIdx < this.totalSlideElements; slideIdx++) {
+				const slideElement = this.#slideElements[slideIdx];
+				const slideElementype = slideElement.getAttribute(this.#slideTypeDataAttr);
+
+				const firstSlideElement = slideElement.firstElementChild;
+				const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
+				const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+				if (slideElementype === "full") {
+					if (direction === "top") {
+						const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+					}
+
+					if (direction === "bottom") {
+						const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+					}
+				}
+
+				if (slideElementype === "multi") {
+					const secondSlideElement = slideElement.lastElementChild;
+					const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
+					const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+
+					if (direction === "top") {
+						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
+						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+					}
+
+					if (direction === "bottom") {
+						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
+						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
+
+						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
+						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+					}
+				}
+
+				if (getState().currentActiveSlideNumber !== choosenSlideNumber) {
+					this.#slideElements[choosenSlideNumber].setAttribute("aria-hidden", "false");
+					this.#slideElements[getState().currentActiveSlideNumber].setAttribute("aria-hidden", "true");
+				}
+
+				setState({
+					type: "ACTIVE-SLIDE",
+					values: {
+						currentActiveSlideNumber: choosenSlideNumber,
+					},
+				});
+
+				/*
+					🕵️‍♂️
+				*/
+				this.#slideElements[getState().currentActiveSlideNumber].style.setProperty("z-index", "1");
+
+				setState({
+					type: "SLIDING-PROCESS",
+					values: {
+						isSlideNavigating: false,
+					},
+				});
+			}
+		}
+	}
+
+	isDekstopView() {
+		const currentViewportWidth = window.innerWidth;
+
+		if (currentViewportWidth > this.#CSSPixelMobileSize) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+class ButtonNavigation {
+	#slide;
+	#slideNavBtnElements;
+	#totalSlideNavBtnElements;
+	#slideNavBtnNumberDataAttr;
+	#slideNavBtnActiveClassname;
+
+	constructor(slide) {
+		this.#slide = slide;
+		this.#slideNavBtnNumberDataAttr = "data-mys-multiscroll-nav";
+		this.#slideNavBtnActiveClassname = "mys-multiscroll-nav__btn--active";
+		this.#slideNavBtnElements = document.getElementsByClassName("mys-multiscroll-nav__btn");
+		this.#totalSlideNavBtnElements = this.#slideNavBtnElements.length;
+
+		this.#run();
+	}
+
+	#run() {
+		this.#navigateSlideNavButtons();
+	}
+
+	#navigateSlideNavButtons() {
+		if (this.#slideNavBtnElements.length === 0) return;
+
+		for (let btnIdx = 0; btnIdx < this.#totalSlideNavBtnElements; btnIdx++) {
+			const navBtnElement = this.#slideNavBtnElements[btnIdx];
+
+			navBtnElement.addEventListener("click", () => {
+				if (this.#slide.isDekstopView() === false) return;
+
+				const { isSlideNavigating, currentActiveSlideNumber } = store.getState();
+
+				if (currentActiveSlideNumber === btnIdx) return;
+				if (isSlideNavigating === true) return;
+
+				const slideNavNumber = navBtnElement.getAttribute(this.#slideNavBtnNumberDataAttr);
+				const slideNavNumberInt = parseInt(slideNavNumber);
+				const slidesComparisonNumber = Math.abs(currentActiveSlideNumber - slideNavNumberInt);
+
+				this.setUnActivePrevBtnNav();
+
+				/* 
+					If the comparison just one slide 
+				*/
+				if (slidesComparisonNumber === 1) {
+					if (currentActiveSlideNumber - 1 === slideNavNumberInt) {
+						this.#slide.oneTimeSlidingSlide("top");
+					}
+
+					if (currentActiveSlideNumber + 1 === slideNavNumberInt) {
+						this.#slide.oneTimeSlidingSlide("bottom");
+					}
+				}
+
+				/* 
+					If the comparison more than one slides 
+				*/
+				if (slidesComparisonNumber > 1) {
+					if (currentActiveSlideNumber !== 0 && slideNavNumberInt < currentActiveSlideNumber) {
+						this.#slide.multipleTimeSlidingSlide("top", slidesComparisonNumber, slideNavNumberInt);
+					}
+
+					if (currentActiveSlideNumber !== this.#slide.totalSlideElements - 1 && slideNavNumberInt > store.getState().currentActiveSlideNumber) {
+						this.#slide.multipleTimeSlidingSlide("bottom", slidesComparisonNumber, slideNavNumberInt);
+					}
+				}
+
+				this.setActiveNextBtnNav();
+			});
+		}
+	}
+
+	setActiveNextBtnNav() {
+		if (this.#slideNavBtnElements.length === 0) return;
+
+		const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+		const navBtnActiveElement = this.#slideNavBtnElements[currentActiveSlideNumber];
+
+		navBtnActiveElement.classList.add(this.#slideNavBtnActiveClassname);
+	}
+
+	setUnActivePrevBtnNav() {
+		if (this.#slideNavBtnElements.length === 0) return;
+
+		const currentActiveSlideNumber = store.getState().currentActiveSlideNumber;
+		const navBtnActiveElement = this.#slideNavBtnElements[currentActiveSlideNumber];
+
+		navBtnActiveElement.classList.remove(this.#slideNavBtnActiveClassname);
+	}
+}
+
+class KeyboardNavigation {
+	#slide;
+	#buttonNavigation;
+
+	constructor(slide, buttonNavigation) {
+		this.#slide = slide;
+		this.#buttonNavigation = buttonNavigation;
+
+		this.#run();
+	}
+
+	#run() {
+		this.#navigateSlideKeyboardEvent();
+	}
+
+	#navigateSlideKeyboardEvent() {
+		const HOME = "Home";
+		const END = "End";
+		const ARROW_UP = "ArrowUp";
+		const ARROW_DOWN = "ArrowDown";
+		const PAGE_UP = "PageUp";
+		const PAGE_DOWN = "PageDown";
+
+		const keydownHandler = (event) => {
+			if (this.#slide.isDekstopView() === false) return;
+
+			const { isSlideNavigating, currentActiveSlideNumber } = store.getState();
+
+			if (isSlideNavigating === true) return;
+
+			const keyboardEventKey = event.key;
+			const totalSlideElements = this.#slide.totalSlideElements - 1;
+
+			if (keyboardEventKey === ARROW_UP || keyboardEventKey === PAGE_UP) {
+				if (currentActiveSlideNumber !== 0) {
+					this.#buttonNavigation.setUnActivePrevBtnNav();
+					this.#slide.oneTimeSlidingSlide("top");
+					this.#buttonNavigation.setActiveNextBtnNav();
+				}
+			}
+
+			if (keyboardEventKey === ARROW_DOWN || keyboardEventKey === PAGE_DOWN) {
+				if (currentActiveSlideNumber !== totalSlideElements) {
+					this.#buttonNavigation.setUnActivePrevBtnNav();
+					this.#slide.oneTimeSlidingSlide("bottom");
+					this.#buttonNavigation.setActiveNextBtnNav();
+				}
+			}
+
+			if (keyboardEventKey === HOME) {
+				if (currentActiveSlideNumber !== 0) {
+					const slideComparison = Math.abs(currentActiveSlideNumber);
+
+					this.#buttonNavigation.setUnActivePrevBtnNav();
+					this.#slide.multipleTimeSlidingSlide("top", slideComparison, 0);
+					this.#buttonNavigation.setActiveNextBtnNav();
+				}
+			}
+
+			if (keyboardEventKey === END) {
+				if (currentActiveSlideNumber !== totalSlideElements) {
+					const slideComparison = Math.abs(currentActiveSlideNumber - totalSlideElements);
+
+					this.#buttonNavigation.setUnActivePrevBtnNav();
+					this.#slide.multipleTimeSlidingSlide("bottom", slideComparison, this.#slide.totalSlideElements - 1);
+					this.#buttonNavigation.setActiveNextBtnNav();
+				}
+			}
+		};
+
+		document.addEventListener("keydown", this.#throttle(keydownHandler, this.#slide.slideTransitionDuration));
+	}
+
+	#throttle(func, delay) {
+		let isCanRun = true;
+
+		return function (...args) {
+			if (isCanRun === true) {
+				func.apply(this, args);
+
+				isCanRun = false;
+
+				setTimeout(() => {
+					isCanRun = true;
+				}, delay);
+			}
+		};
+	}
+}
+
+class WheelScrollNavigation {
+	#slide;
+	#buttonNavigation;
+
+	constructor(slide, buttonNavigation) {
+		this.#slide = slide;
+		this.#buttonNavigation = buttonNavigation;
+
+		this.#run();
+	}
+
+	#run() {
+		this.#navigateSlideWheelEvent();
+	}
+
+	#navigateSlideWheelEvent() {
+		const DELTA_THRESHOLD = 50;
+		const NOISE_THRESHOLD = 20;
+		const MINIMUM_TIME_STAMP = 300;
+
+		let wheelPower = 0;
+		let wheelTimeStamp = 0;
+		let isWheelLock = false;
+		let wheelLockTimer = null;
+
+		const wheelEventHandler = (event) => {
+			if (this.#slide.isDekstopView() === false) return;
+
+			const { isSlideNavigating, currentActiveSlideNumber } = store.getState();
+
+			if (isSlideNavigating === true) return;
+
+			const delta = event.deltaY * -1;
+			const absDelta = Math.abs(delta);
+			const currentTimeStamp = event.timeStamp;
+
+			if (absDelta < NOISE_THRESHOLD) return;
+			if (currentTimeStamp - wheelTimeStamp < MINIMUM_TIME_STAMP && isWheelLock === true) return;
+
+			wheelTimeStamp = currentTimeStamp;
+
+			if (wheelPower < absDelta && isWheelLock === false) {
+				/*
+					Scroll to top
+						- Swipe to bottom (for trackpad)
+				*/
+				if (delta > DELTA_THRESHOLD) {
+					if (currentActiveSlideNumber !== 0) {
+						this.#buttonNavigation.setUnActivePrevBtnNav();
+						this.#slide.oneTimeSlidingSlide("top");
+						this.#buttonNavigation.setActiveNextBtnNav();
+					}
+				}
+
+				/*
+					Scroll to bottom
+						- Swipe to top (for trackpad)
+				*/
+				if (delta < -DELTA_THRESHOLD) {
+					if (currentActiveSlideNumber !== this.#slide.totalSlideElements - 1) {
+						this.#buttonNavigation.setUnActivePrevBtnNav();
+						this.#slide.oneTimeSlidingSlide("bottom");
+						this.#buttonNavigation.setActiveNextBtnNav();
+					}
+				}
+
+				lock(absDelta);
+
+				clearTimeout(wheelLockTimer);
+
+				wheelLockTimer = setTimeout(() => {
+					if (wheelPower !== absDelta) return;
+
+					unlock();
+				}, this.#slide.slideTransitionDuration);
+			}
+
+			if (absDelta < DELTA_THRESHOLD && isWheelLock === true) {
+				unlock();
+			}
+
+			function lock(absDelta) {
+				wheelPower = absDelta;
+				isWheelLock = true;
+			}
+
+			function unlock() {
+				wheelPower = DELTA_THRESHOLD;
+				isWheelLock = false;
+			}
+		};
+
+		document.addEventListener("wheel", wheelEventHandler, {
+			passive: true,
+		});
+	}
+}
+
+class Mulstiscroll {
+	constructor() {
+		this.#main();
+	}
+
+	#main() {
+		const slide = new Slide();
+		const buttonNavigation = new ButtonNavigation(slide);
+
+		new KeyboardNavigation(slide, buttonNavigation);
+		new WheelScrollNavigation(slide, buttonNavigation);
+	}
+}
+
+new Mulstiscroll();

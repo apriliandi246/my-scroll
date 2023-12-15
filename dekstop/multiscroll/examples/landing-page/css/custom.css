@@ -1,0 +1,321 @@
+.gin-bottle {
+	position: relative;
+}
+
+.gin-bottle img {
+	width: 100%;
+}
+
+.heading-slide {
+	color: #666;
+	font-size: 48px;
+	text-align: center;
+	font-weight: 400;
+	margin-top: 40px;
+	margin-bottom: 40px;
+	font-family: Arial serif;
+}
+
+.desc-slide {
+	color: #666;
+	width: 437px;
+	font-size: 16px;
+	line-height: 27px;
+	text-align: center;
+	margin-bottom: 48px;
+	text-transform: capitalize;
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.slide-link {
+	color: #666;
+	font-size: 14px;
+	cursor: pointer;
+	font-weight: 300;
+	padding: 9px 32px;
+	letter-spacing: 5px;
+	text-decoration: none;
+	border: 1px solid #666;
+	text-transform: uppercase;
+}
+
+.slide-desc {
+	padding: 40px 16px;
+}
+
+.bg-video-slide {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.full-title-slide-3 {
+	color: #666;
+	display: none;
+	font-size: 48px;
+	font-weight: 400;
+	margin-bottom: 66px;
+	font-family: Arial serif;
+}
+
+.title-slide-3 {
+	color: #666;
+	font-size: 48px;
+	font-weight: 400;
+	margin-bottom: 66px;
+	font-family: Arial serif;
+}
+
+.slide-3-middle-bottle {
+	display: none;
+}
+
+.half-bottle-slide {
+	margin-left: -10px;
+}
+
+.slide-0-left {
+	background-color: #f3f3f3;
+}
+
+.slide-0-right {
+	background-color: #fff;
+}
+
+.slide-1-left {
+	background-color: #f3f3f3;
+}
+
+.slide-1-right {
+	background-color: #fff;
+}
+
+.slide-2-left {
+	background-color: #f3f3f3;
+}
+
+.slide-2-right {
+	background-color: #fff;
+}
+
+.slide-3-left {
+	overflow: hidden;
+	background-color: #f3f3f3;
+}
+
+.slide-3-right {
+	overflow: hidden;
+	background-color: #f3f3f3;
+}
+
+.title-slide-3--left {
+	width: 100%;
+	text-align: right;
+}
+
+.bottles-wrapper-slide-3--left {
+	width: 100%;
+	text-align: right;
+}
+
+.slide-1-bg-img {
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image: url(../img/bg-image-slide-2.png);
+}
+
+.slide-3-link-multi {
+	color: #666;
+	font-size: 14px;
+	cursor: pointer;
+	font-weight: 300;
+	padding: 9px 32px;
+	letter-spacing: 5px;
+	text-decoration: none;
+	border: 1px solid #666;
+	text-transform: uppercase;
+	background-color: transparent;
+}
+
+.slide-3-link-multi--left {
+	right: 0;
+	bottom: 0;
+	position: absolute;
+	margin-right: -86px;
+	margin-bottom: 60px;
+}
+
+.title-slide-3--right {
+	width: 100%;
+	text-align: left;
+}
+
+.slide-3-link-multi--right {
+	left: 0;
+	bottom: 0;
+	position: absolute;
+	margin-left: -87px;
+	margin-bottom: 60px;
+}
+
+.slide-3-right-link {
+	color: #666;
+	display: none;
+	font-size: 14px;
+	cursor: pointer;
+	font-weight: 300;
+	margin-top: 33px;
+	padding: 9px 32px;
+	letter-spacing: 5px;
+	text-decoration: none;
+	border: 1px solid #666;
+	text-transform: uppercase;
+	background-color: transparent;
+}
+
+.bottles-wrapper-slide-3--right {
+	width: 100%;
+	text-align: left;
+}
+
+.slide-4-left {
+	background-color: #f3f3f3;
+}
+
+.slide-4-right {
+	background-color: #fff;
+}
+
+.slide-4-bg-img {
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-image: url(../img//bg-img-slide-5.png);
+}
+
+.slide-4-form {
+	width: 437px;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.slide-4-form .general-input {
+	width: 100%;
+	border: none;
+	outline: none;
+	text-align: center;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #666;
+}
+
+.slide-4-form .general-input:first-child {
+	margin-bottom: 26px;
+}
+
+.slide-4-form .general-input::placeholder {
+	color: #666;
+	font-size: 14px;
+	font-weight: 300;
+	text-align: center;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+}
+
+.slide-4-form button {
+	color: #666;
+	font-size: 14px;
+	cursor: pointer;
+	font-weight: 300;
+	padding: 9px 32px;
+	letter-spacing: 5px;
+	border: 1px solid #666;
+	text-transform: uppercase;
+	background-color: transparent;
+}
+
+.checkbox-agreement {
+	display: flex;
+	margin-top: 28px;
+	align-items: center;
+	margin-bottom: 48px;
+	justify-content: center;
+}
+
+.checkbox-agreement .checkbox-label {
+	color: #666;
+	font-size: 12px;
+	display: inline;
+	font-weight: 300;
+	margin-left: 10px;
+	text-transform: uppercase;
+}
+
+@media screen and (max-width: 1010px) {
+	.half-bottle-slide {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 992px) {
+	.desc-slide {
+		width: 100%;
+	}
+
+	.slide-1-bg-img {
+		height: 400px;
+	}
+
+	.full-title-slide-3 {
+		width: 100%;
+		display: block;
+		text-align: center;
+		text-transform: capitalize;
+	}
+
+	.title-slide-3 {
+		display: none;
+	}
+
+	.bottles-wrapper-slide-3--left,
+	.bottles-wrapper-slide-3--right {
+		width: 100%;
+		text-align: center;
+	}
+
+	.half-bottle-slide {
+		display: none;
+	}
+
+	.slide-3-link-multi {
+		display: none;
+	}
+
+	.slide-3-right-link {
+		display: inline;
+		margin-top: 40px;
+	}
+
+	.slide-4-bg-img {
+		height: 400px;
+	}
+
+	.bg-video-slide {
+		height: 400px;
+	}
+
+	.slide-3-middle-bottle {
+		display: inline;
+	}
+
+	.slide-3-left,
+	.slide-3-right {
+		padding: 40px 16px;
+	}
+}
