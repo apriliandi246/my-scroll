@@ -2,3 +2,4 @@ node_modules/
 coverage/
 TODO.txt
 some-shit/
+.DS_Store
