@@ -113,41 +113,43 @@ class Slide {
 
 			const firstSlideElement = slideElement.firstElementChild;
 			const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
-			const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+			const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+			const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
 
 			if (slideElementType === "full") {
 				if (direction === "top") {
 					const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
 
-					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+					firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%), 0`);
 				}
 
 				if (direction === "bottom") {
 					const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
 
-					firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+					firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%), 0`);
 				}
 			}
 
 			if (slideElementType === "multi") {
 				const secondSlideElement = slideElement.lastElementChild;
 				const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
-				const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+				const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+				const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
 
 				if (direction === "top") {
 					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
 					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
 
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
-					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+					firstSlideElement.style.setProperty("transform", `translate3d(0, ${firstSlideTranslateYPosition}%, 0)`);
+					secondSlideElement.style.setProperty("transform", `translate3d(0, ${secondSlideTranslateYPosition}%, 0)`);
 				}
 
 				if (direction === "bottom") {
 					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
 					const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
 
-					firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
-					secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+					firstSlideElement.style.setProperty("transform", `translate3d(0, ${firstSlideTranslateYPosition}%, 0)`);
+					secondSlideElement.style.setProperty("transform", `translate3d(0, ${secondSlideTranslateYPosition}%, 0)`);
 				}
 			}
 		}
@@ -211,41 +213,43 @@ class Slide {
 
 				const firstSlideElement = slideElement.firstElementChild;
 				const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
-				const firstSlideElTranslateYPosition = parseInt(firstSlideElTransformValue.replace(/[^-\d.]/g, ""));
+				const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+				const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
 
 				if (slideElementype === "full") {
 					if (direction === "top") {
 						const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
 
-						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+						firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%, 0)`);
 					}
 
 					if (direction === "bottom") {
 						const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
 
-						firstSlideElement.style.setProperty("transform", `translateY(${slideTranslateYPosition}%)`);
+						firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%, 0)`);
 					}
 				}
 
 				if (slideElementype === "multi") {
 					const secondSlideElement = slideElement.lastElementChild;
 					const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
-					const secondSlideElTranslateYPosition = parseInt(secondSlideElTransformValue.replace(/[^-\d.]/g, ""));
+					const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+					const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
 
 					if (direction === "top") {
 						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
 						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition - 100;
 
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
-						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+						firstSlideElement.style.setProperty("transform", `translate3d(0, ${firstSlideTranslateYPosition}%, 0)`);
+						secondSlideElement.style.setProperty("transform", `translate3d(0, ${secondSlideTranslateYPosition}%, 0)`);
 					}
 
 					if (direction === "bottom") {
 						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition - 100;
 						const secondSlideTranslateYPosition = secondSlideElTranslateYPosition + 100;
 
-						firstSlideElement.style.setProperty("transform", `translateY(${firstSlideTranslateYPosition}%)`);
-						secondSlideElement.style.setProperty("transform", `translateY(${secondSlideTranslateYPosition}%)`);
+						firstSlideElement.style.setProperty("transform", `translate3d(0, ${firstSlideTranslateYPosition}%, 0)`);
+						secondSlideElement.style.setProperty("transform", `translate3d(0, ${secondSlideTranslateYPosition}%, 0)`);
 					}
 				}
 
