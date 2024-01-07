@@ -1,16 +1,17 @@
-<h1 align="center">🖱 scroll-swipe-functionalities</h1>
+<h1 align="center">🖱 my-scroll</h1>
 
 <br>
 
 ### 👨‍💻 About
 
-Multiscroll (dekstop) and Swipe (mobile) functionalities....
+Multiscroll page functionality with straightforward HTML code....
 
-Multiscroll dekstop simple demo: [Here](https://multiscroll-simple-demo.netlify.app)
+<h3 align="center">. . .</h3>
 
-Multiscroll dekstop landing page: [Here](https://multiscroll-landing-page.netlify.app)
+### 🏃 Demo
 
-Swipe mobile demo: (on progress)
+Multiscroll simple demo: [Here](https://multiscroll-simple-demo.netlify.app)
+Multiscroll landing page demo: [Here](https://multiscroll-landing-page.netlify.app)
 
 <h3 align="center">. . .</h3>
 
