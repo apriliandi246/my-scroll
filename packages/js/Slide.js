@@ -114,7 +114,7 @@ class Slide {
 			const firstSlideElement = slideElement.firstElementChild;
 			const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
 			const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
-			const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
+			const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[2]);
 
 			if (slideElementType === "full") {
 				if (direction === "top") {
@@ -132,7 +132,7 @@ class Slide {
 				const secondSlideElement = slideElement.lastElementChild;
 				const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
 				const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
-				const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
+				const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[2]);
 
 				if (direction === "top") {
 					const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
@@ -212,7 +212,7 @@ class Slide {
 				const firstSlideElement = slideElement.firstElementChild;
 				const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
 				const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
-				const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
+				const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[2]);
 
 				if (slideElementype === "full") {
 					if (direction === "top") {
@@ -232,7 +232,7 @@ class Slide {
 					const secondSlideElement = slideElement.lastElementChild;
 					const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
 					const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
-					const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
+					const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[2]);
 
 					if (direction === "top") {
 						const firstSlideTranslateYPosition = firstSlideElTranslateYPosition + 100;
