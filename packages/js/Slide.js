@@ -113,19 +113,17 @@ class Slide {
 
 			const firstSlideElement = slideElement.firstElementChild;
 			const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
-			const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+			const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
 			const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
 
 			if (slideElementType === "full") {
 				if (direction === "top") {
 					const slideTranslateYPosition = firstSlideElTranslateYPosition + 100;
-
 					firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%), 0`);
 				}
 
 				if (direction === "bottom") {
 					const slideTranslateYPosition = firstSlideElTranslateYPosition - 100;
-
 					firstSlideElement.style.setProperty("transform", `translate3d(0, ${slideTranslateYPosition}%), 0`);
 				}
 			}
@@ -133,7 +131,7 @@ class Slide {
 			if (slideElementType === "multi") {
 				const secondSlideElement = slideElement.lastElementChild;
 				const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
-				const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+				const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
 				const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
 
 				if (direction === "top") {
@@ -213,7 +211,7 @@ class Slide {
 
 				const firstSlideElement = slideElement.firstElementChild;
 				const firstSlideElTransformValue = firstSlideElement.style.getPropertyValue("transform");
-				const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+				const firstSlideElTranslatePosition = firstSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
 				const firstSlideElTranslateYPosition = parseInt(firstSlideElTranslatePosition[1]);
 
 				if (slideElementype === "full") {
@@ -233,7 +231,7 @@ class Slide {
 				if (slideElementype === "multi") {
 					const secondSlideElement = slideElement.lastElementChild;
 					const secondSlideElTransformValue = secondSlideElement.style.getPropertyValue("transform");
-					const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\(0px, (\d+|-\d+)%, 0px\)/);
+					const secondSlideElTranslatePosition = secondSlideElTransformValue.match(/translate3d\((0|0px), (\d+|-\d+)%, (0|0px)\)/);
 					const secondSlideElTranslateYPosition = parseInt(secondSlideElTranslatePosition[1]);
 
 					if (direction === "top") {

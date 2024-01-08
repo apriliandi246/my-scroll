@@ -1,4 +1,4 @@
-import store from "../../packages/javascript/store.js";
+import store from "../../packages/js/store.js";
 
 function setupStore() {
 	store.setState({
