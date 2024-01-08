@@ -2,8 +2,8 @@ const config = {
 	verbose: true,
 	collectCoverage: true,
 	testEnvironment: "jsdom",
-	testPathIgnorePatterns: ["/node_modules/", "/scroll-swipe/dekstop/multiscroll/test/helpers"],
-	coveragePathIgnorePatterns: ["/scroll-swipe/dekstop/multiscroll/test/helpers", "/scroll-swipe/dekstop/multiscroll/packages/javascript/store.js"],
+	testPathIgnorePatterns: ["/node_modules/", "/my-scroll/__test__/helpers/"],
+	coveragePathIgnorePatterns: ["/my-scroll/__test__/helpers/", "/my-scroll/packages/js/store.js"],
 };
 
 export default config;
