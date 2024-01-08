@@ -14,6 +14,8 @@ Multiscroll simple demo: [Here](https://multiscroll-simple-demo.netlify.app)
 
 Multiscroll landing page demo: [Here](https://multiscroll-landing-page.netlify.app)
 
+And you can also see the implementation with React JS [here](https://github.com/apriliandi246/react-multi-scroll)
+
 <h3 align="center">. . .</h3>
 
 ### 🧰 Tech Stack
